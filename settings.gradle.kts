@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Rocket"
+rootProject.name = "UTM"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 

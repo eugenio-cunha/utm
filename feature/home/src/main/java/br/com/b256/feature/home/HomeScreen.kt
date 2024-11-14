@@ -28,5 +28,5 @@ internal fun HomeScreen(
     uiState: HomeUiState,
     onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
-    Particles()
+
 }

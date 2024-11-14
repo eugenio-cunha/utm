@@ -15,7 +15,7 @@ android {
     namespace = "br.com.b256"
 
     defaultConfig {
-        applicationId = "br.com.b256.rocket"
+        applicationId = "br.com.b256.utm"
         versionCode = project.getVersionCode(diff = 0)
         versionName = project.getVersionName(mayor = 1, minor = 0, patch = 0)
 
