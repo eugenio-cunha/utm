@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Permite substituir atributos específicos da noite na pasta values-night. -->
+    <style name="NightAdjusted.Theme.B256" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- O tema final que usamos -->
+    <style name="Theme.B256" parent="NightAdjusted.Theme.B256" />
+
+    <style name="NightAdjusted.Theme.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="Theme.B256.Splash" parent="NightAdjusted.Theme.Splash">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.B256</item>
+    </style>
+</resources>

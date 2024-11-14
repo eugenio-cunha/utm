@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Rocket</string>
+    <string name="app_offline">⚠️ Você não está conectado à internet</string>
+</resources>

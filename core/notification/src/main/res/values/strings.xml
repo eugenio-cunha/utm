@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_notification_channel_name">B256</string>
+    <string name="core_notification_channel_description">As últimas atualizações</string>
+    <string name="core_notification_group_summary">%1$d Atualizações</string>
+</resources>

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Caminho para o arquivo da mensagem de commit
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Verifica se é um commit merge ou rebase para não modificar a mensagem
+if [ "$COMMIT_SOURCE" = "merge" ] || [ -n "$SHA1" ]; then
+    exit 0
+fi
+
+# Obtém o nome da branch atual
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+
+# Se a branch for detached (por exemplo, durante um rebase ou hotfix), não faz nada
+if [ "$BRANCH_NAME" = "HEAD" ]; then
+    exit 0
+fi
+
+# Lê a mensagem de commit existente
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Modifica a mensagem de commit para incluir o nome da branch no formato desejado
+echo "$BRANCH_NAME - $COMMIT_MSG" > "$COMMIT_MSG_FILE"
