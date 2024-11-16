@@ -11,6 +11,8 @@ dependencies {
     api(libs.kotlinx.datetime)
     api(libs.kotlinx.coroutines.core)
 
+    implementation(libs.androidx.localbroadcastmanager)
+
     testImplementation(libs.turbine)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.hilt.android.testing)
