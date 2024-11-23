@@ -1,4 +1,4 @@
-package br.com.b256.feature.home
+package br.com.b256.feature.place
 
 import android.location.Location
 import androidx.compose.foundation.layout.Column
@@ -9,36 +9,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-internal fun HomeScreen(
+internal fun PlaceScreen(
     modifier: Modifier = Modifier,
-    onShowSnackbar: suspend (String, String?) -> Boolean,
-    viewModel: HomeViewModel = hiltViewModel(),
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    viewModel: PlaceViewModel = hiltViewModel(),
+){
     val location by viewModel.location.collectAsState()
 
-    HomeScreen(
+    PlaceScreen(
         modifier = modifier,
-        uiState = uiState,
-        location = location,
-        onShowSnackbar = onShowSnackbar,
+        location = location
     )
 }
 
 @Composable
-internal fun HomeScreen(
+private fun PlaceScreen(
     modifier: Modifier = Modifier,
-    uiState: HomeUiState,
-    location: Location?,
-    onShowSnackbar: suspend (String, String?) -> Boolean,
-) {
+    location: Location?
+){
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
-        Text(text = "Location Updates")
+        Text(text = "Place")
         location?.let {
             Text(text = "Latitude: ${it.latitude}")
             Text(text = "Longitude: ${it.longitude}")

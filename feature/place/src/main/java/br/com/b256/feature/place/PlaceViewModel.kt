@@ -1,4 +1,4 @@
-package br.com.b256.feature.home
+package br.com.b256.feature.place
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -11,21 +11,16 @@ import android.os.IBinder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.b256.core.gps.service.LocationService
-import br.com.core.b256.domain.GetSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val getSettingsUseCase: GetSettingsUseCase,
+class PlaceViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
     @SuppressLint("StaticFieldLeak")
@@ -44,13 +39,6 @@ class HomeViewModel @Inject constructor(
             locationService = null
         }
     }
-
-    val uiState: StateFlow<HomeUiState> = getSettingsUseCase().map(HomeUiState::Success)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeUiState.Loading,
-        )
 
     init {
         startService()
