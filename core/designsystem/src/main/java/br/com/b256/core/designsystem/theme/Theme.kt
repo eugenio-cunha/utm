@@ -40,7 +40,7 @@ val LightDefaultColorScheme = lightColorScheme(
     inverseOnSurface = lightInverseOnSurface,
     inverseSurface = lightInverseSurface,
     inversePrimary = lightInversePrimary,
-    surfaceTint = lightSurfaceDim,
+    surfaceTint = lightSurfaceTint,
     outlineVariant = lightOutlineVariant,
     scrim = lightScrim,
 )
@@ -76,7 +76,7 @@ val DarkDefaultColorScheme = darkColorScheme(
     inverseOnSurface = darkInverseOnSurface,
     inverseSurface = darkInverseSurface,
     inversePrimary = darkInversePrimary,
-    surfaceTint = darkSurfaceDim,
+    surfaceTint = darkSurfaceTint,
     outlineVariant = darkOutlineVariant,
     scrim = darkScrim,
 )

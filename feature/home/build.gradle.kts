@@ -11,6 +11,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.common)
     implementation(projects.core.model)
+    implementation(projects.core.service)
 
     testImplementation(libs.robolectric)
     testImplementation(libs.hilt.android.testing)

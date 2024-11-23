@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import br.com.b256.feature.home.navigation.HomeRoute
 import br.com.b256.feature.home.navigation.homeScreen
+import br.com.b256.feature.place.navigation.PlaceRoute
+import br.com.b256.feature.place.navigation.placeScreen
 import br.com.b256.ui.B256AppState
 
 @Composable
@@ -17,8 +19,10 @@ fun B256NavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = HomeRoute
+        startDestination = PlaceRoute
     ) {
-        homeScreen(onShowSnackbar = onShowSnackbar,)
+        placeScreen()
+
+        homeScreen(onShowSnackbar = onShowSnackbar)
     }
 }

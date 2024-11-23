@@ -5,7 +5,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
@@ -18,4 +21,6 @@ object B256Icons {
     val Camera = Icons.Outlined.Camera
     val Dismiss = Icons.Outlined.Clear
     val Accept = Icons.Outlined.Done
+    val Place = Icons.Outlined.Place
+    val Home = Icons.Outlined.Home
 }

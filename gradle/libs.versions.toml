@@ -51,6 +51,7 @@ material = "1.12.0"
 robolectric = "4.12.2"
 androidxCamera = "1.3.4"
 localbroadcastmanager = "1.0.0"
+geoCords = "1.0"
 
 [bundles]
 androidx-compose-ui-test = ["androidx-compose-ui-test", "androidx-compose-ui-testManifest"]
@@ -135,6 +136,7 @@ androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycl
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "androidxCamera" }
 androidx-camera-extension = { group = "androidx.camera", name = "camera-extensions", version.ref = "androidxCamera" }
 androidx-localbroadcastmanager = { group = "androidx.localbroadcastmanager", name = "localbroadcastmanager", version.ref = "localbroadcastmanager" }
+geo-coords = { group = "com.rgi-corp", name = "ww-geo-coords", version.ref = "geoCords" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

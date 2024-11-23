@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration.Indefinite
+import androidx.compose.material3.SnackbarDuration.Short
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -30,12 +34,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import br.com.b256.R
 import br.com.b256.core.designsystem.component.B256Background
 import br.com.b256.core.designsystem.component.B256GradientBackground
+import br.com.b256.core.designsystem.component.B256NavigationSuiteScaffold
 import br.com.b256.core.designsystem.component.B256TopAppBar
 import br.com.b256.core.designsystem.icon.B256Icons
 import br.com.b256.core.designsystem.theme.GradientColors
@@ -43,8 +49,7 @@ import br.com.b256.core.designsystem.theme.LocalGradientColors
 import br.com.b256.feature.settings.SettingsDialog
 import br.com.b256.navigation.B256Destination
 import br.com.b256.navigation.B256NavHost
-import androidx.compose.material3.SnackbarDuration.Indefinite
-import androidx.compose.material3.SnackbarDuration.Short
+import kotlin.reflect.KClass
 
 @Composable
 fun B256App(
@@ -75,7 +80,7 @@ fun B256App(
                 if (isOffline) {
                     snackbarHostState.showSnackbar(
                         message = offlineMessage,
-                        duration = Indefinite
+                        duration = Indefinite,
                     )
                 }
             }
@@ -93,7 +98,7 @@ fun B256App(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun B256App(
     modifier: Modifier = Modifier,
@@ -104,67 +109,97 @@ internal fun B256App(
     onTopAppBarActionClick: () -> Unit,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
 ) {
+    val currentDestination = appState.currentDestination
+
     if (showSettingsDialog) {
         SettingsDialog(
             onDismiss = { onSettingsDismissed() },
         )
     }
 
-    Scaffold(
-        modifier = modifier.semantics {
-            testTagsAsResourceId = true
-        },
-        containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        contentWindowInsets = WindowInsets(0, 0, 0, 120),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .consumeWindowInsets(padding)
-                .windowInsetsPadding(
-                    WindowInsets.safeDrawing.only(
-                        WindowInsetsSides.Horizontal,
-                    ),
-                ),
-        ) {
-            val destination = appState.currentTopLevelDestination
-            var shouldShowTopAppBar = false
-            if (destination != null) {
-                shouldShowTopAppBar = true
-                B256TopAppBar(
-                    title = destination.titleTextId,
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent,
-                    ),
-                    actionIcon = B256Icons.More,
-                    onActionClick = onTopAppBarActionClick,
-                    onNavigationClick = appState::navigateToHome,
+    B256NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            appState.topLevelDestinations.forEach { destination ->
+                val selected = currentDestination
+                    .isRouteInHierarchy(destination.route)
+                item(
+                    selected = selected,
+                    onClick = { appState.navigateToDestination(destination) },
+                    icon = {
+                        Icon(
+                            imageVector = destination.icon,
+                            contentDescription = null,
+                        )
+                    },
+                    label = { Text(
+                        text = stringResource(destination.titleTextId),
+                        style = MaterialTheme.typography.labelMedium
+                    ) },
                 )
-            }
 
-            Box(
-                modifier = Modifier.consumeWindowInsets(
-                    if (shouldShowTopAppBar) {
-                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
-                    } else {
-                        WindowInsets(0, 0, 0, 0)
-                    },
-                ),
+            }
+        },
+        windowAdaptiveInfo = windowAdaptiveInfo,
+    ) {
+        Scaffold(
+            modifier = modifier,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .consumeWindowInsets(padding)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    ),
             ) {
-                B256NavHost(
-                    appState = appState,
-                    onShowSnackbar = { message, action ->
-                        snackbarHostState.showSnackbar(
-                            message = message,
-                            actionLabel = action,
-                            duration = Short,
-                        ) == SnackbarResult.ActionPerformed
-                    },
-                )
+                val destination = appState.currentTopLevelDestination
+                var shouldShowTopAppBar = false
+                if (destination != null) {
+                    shouldShowTopAppBar = true
+                    B256TopAppBar(
+                        title = destination.titleTextId,
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = Color.Transparent,
+                        ),
+                        actionIcon = B256Icons.More,
+                        onActionClick = onTopAppBarActionClick,
+                        onNavigationClick = appState::navigateToHome,
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.consumeWindowInsets(
+                        if (shouldShowTopAppBar) {
+                            WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
+                        } else {
+                            WindowInsets(0, 0, 0, 0)
+                        },
+                    ),
+                ) {
+                    B256NavHost(
+                        appState = appState,
+                        onShowSnackbar = { message, action ->
+                            snackbarHostState.showSnackbar(
+                                message = message,
+                                actionLabel = action,
+                                duration = Short,
+                            ) == SnackbarResult.ActionPerformed
+                        },
+                    )
+                }
             }
         }
     }
 }
+
+private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
+    this?.hierarchy?.any {
+        it.hasRoute(route)
+    } ?: false
