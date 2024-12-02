@@ -3,9 +3,9 @@ package br.com.b256.core.designsystem.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * B256 colors.
+ * B256 colors. https://material-foundation.github.io/material-theme-builder/
  */
-internal val lightPrimary = Color(0xFF2A5BB1)
+internal val lightPrimary = Color(0xFFBA1A1A) //0xFF2A5BB1
 internal val lightOnPrimary = Color(0xFFFFFFFF)
 internal val lightPrimaryContainer = Color(0xFFD9E2FF)
 internal val lightOnPrimaryContainer = Color(0xFF001A43)
@@ -36,7 +36,7 @@ internal val lightSurfaceTint = Color(0xFF2A5BB1)
 internal val lightOutlineVariant = Color(0xFFC5C6D0)
 internal val lightScrim = Color(0xFF000000)
 
-internal val darkPrimary = Color(0xFFAFC6FF)
+internal val darkPrimary = Color(0xFFFF897A)
 internal val darkOnPrimary = Color(0xFF002D6C)
 internal val darkPrimaryContainer = Color(0xFF004397)
 internal val darkOnPrimaryContainer = Color(0xFFD9E2FF)
