@@ -5,6 +5,12 @@ import br.com.b256.core.gps.LocaleHelper
 import br.com.b256.core.gps.model.UTM
 import gov.nasa.worldwind.geom.Angle
 import gov.nasa.worldwind.geom.coords.UTMCoord
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 private fun getUtmEasting(lat: Double, lon: Double): String {
     return "${
@@ -67,3 +73,12 @@ val Location.UTM: UTM
         getUtmNorthing(latitude, longitude),
         getUtmCoord(latitude, longitude).centralMeridian.toString(),
     )
+
+fun Location.instant() = Instant.fromEpochMilliseconds(time)
+
+fun Location.localDateTime() = instant().toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+
+fun Location.localDateTimeString(): String {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm", Locale.getDefault())
+    return localDateTime().toJavaLocalDateTime().format(formatter)
+}
