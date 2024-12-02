@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
+    implementation(libs.androidx.constraintlayout)
 
     androidTestImplementation(libs.bundles.androidx.compose.ui.test)
 }

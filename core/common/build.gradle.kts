@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.b256.android.library)
     alias(libs.plugins.b256.hilt)
+
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -10,6 +12,7 @@ android {
 dependencies {
     api(libs.kotlinx.datetime)
     api(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.localbroadcastmanager)
 

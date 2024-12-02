@@ -1,9 +1,13 @@
 plugins {
-    alias(libs.plugins.b256.jvm.library)
+    alias(libs.plugins.b256.android.library)
+
+    kotlin("plugin.serialization")
+}
+
+android {
+    namespace = "br.com.core.b256.model"
 }
 
 dependencies {
-    implementation(libs.kotlinx.datetime)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.kotlinx.coroutines.test)
+    implementation(projects.core.common)
 }
