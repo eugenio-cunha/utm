@@ -53,7 +53,7 @@ internal val B256Typography = Typography(
         ),
     ),
     titleLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
@@ -63,7 +63,7 @@ internal val B256Typography = Typography(
         ),
     ),
     titleMedium = TextStyle(
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.1.sp,
