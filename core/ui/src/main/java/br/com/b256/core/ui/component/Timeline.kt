@@ -83,73 +83,96 @@ private fun LazyListScope.toLazyViewScope() = object : LazyViewScope {
 }
 
 fun LazyViewScope.item(
-    visible: Boolean = true,
-    imageVector: ImageVector,
+    icon: ImageVector,
     content: @Composable () -> Unit,
 ) {
-    if (visible) {
-        item {
-            val color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                val (circle, topLine, bottomLine, reviewContent) = createRefs()
-
-                VerticalDivider(
-                    modifier = Modifier.constrainAs(topLine) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(circle.top, 1.dp)
-                        start.linkTo(circle.start)
-                        end.linkTo(circle.end)
-                        width = Dimension.value(1.dp)
-                        height = Dimension.fillToConstraints
-                    },
-                    color = color,
-                )
-
-                Icon(
-                    modifier = Modifier
-                        .size(IconDouble)
-                        .constrainAs(circle) {
-                            start.linkTo(parent.start)
-                            top.linkTo(reviewContent.top)
-                            bottom.linkTo(reviewContent.bottom)
-                        },
-                    imageVector = imageVector,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, end = 15.dp)
-                        .constrainAs(reviewContent) {
-                            start.linkTo(circle.end, 5.dp)
-                            top.linkTo(parent.top, 15.dp)
-                            bottom.linkTo(parent.bottom)
-                            end.linkTo(parent.end)
-                        },
-                    shape = MaterialTheme.shapes.small,
-                    content = content,
-                )
-
-                VerticalDivider(
-                    modifier = Modifier.constrainAs(bottomLine) {
-                        top.linkTo(circle.bottom, 1.dp)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(circle.start)
-                        end.linkTo(circle.end)
-                        width =
-                            Dimension.value(StrokeHalf)
-                        height = Dimension.fillToConstraints
-                    },
-                    color = color,
-                )
-            }
-        }
+    item {
+        Point(
+            icon = icon,
+            content = content,
+        )
     }
 }
 
+inline fun <T> LazyViewScope.items(
+    items: List<T>,
+    icon: ImageVector,
+    noinline key: ((item: T) -> Any)? = null,
+    noinline contentType: (item: T) -> Any? = { null },
+    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit,
+) = items(
+    count = items.size,
+    key = if (key != null) { index: Int -> key(items[index]) } else null,
+    contentType = { index: Int -> contentType(items[index]) },
+) {
+    Point(icon = icon) {
+        itemContent(items[it])
+    }
+}
 
+@Composable
+fun Point(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    content: @Composable () -> Unit,
+) {
+    val color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
+    ConstraintLayout(
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        val (circle, topLine, bottomLine, reviewContent) = createRefs()
+
+        VerticalDivider(
+            modifier = Modifier.constrainAs(topLine) {
+                top.linkTo(parent.top)
+                bottom.linkTo(circle.top, 1.dp)
+                start.linkTo(circle.start)
+                end.linkTo(circle.end)
+                width = Dimension.value(1.dp)
+                height = Dimension.fillToConstraints
+            },
+            color = color,
+        )
+
+        Icon(
+            modifier = Modifier
+                .size(IconDouble)
+                .constrainAs(circle) {
+                    start.linkTo(parent.start)
+                    top.linkTo(reviewContent.top)
+                    bottom.linkTo(reviewContent.bottom)
+                },
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 15.dp)
+                .constrainAs(reviewContent) {
+                    start.linkTo(circle.end, 5.dp)
+                    top.linkTo(parent.top, 15.dp)
+                    bottom.linkTo(parent.bottom)
+                    end.linkTo(parent.end)
+                },
+            shape = MaterialTheme.shapes.small,
+            content = content,
+        )
+
+        VerticalDivider(
+            modifier = Modifier.constrainAs(bottomLine) {
+                top.linkTo(circle.bottom, 1.dp)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(circle.start)
+                end.linkTo(circle.end)
+                width =
+                    Dimension.value(StrokeHalf)
+                height = Dimension.fillToConstraints
+            },
+            color = color,
+        )
+    }
+}
