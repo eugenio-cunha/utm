@@ -26,7 +26,7 @@ object B256NavigationDefaults {
     fun navigationContentColor() = MaterialTheme.colorScheme.onSurfaceVariant
 
     @Composable
-    fun navigationSelectedItemColor() = MaterialTheme.colorScheme.onPrimaryContainer
+    fun navigationSelectedItemColor() = MaterialTheme.colorScheme.primary
 
     @Composable
     fun navigationIndicatorColor() = MaterialTheme.colorScheme.primaryContainer

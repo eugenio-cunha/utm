@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.GpsFixed
 import androidx.compose.material.icons.outlined.Home
@@ -42,4 +43,5 @@ object B256Icons {
     val Share = Icons.Outlined.Share
     val Add = Icons.Outlined.Add
     val Auto = Icons.Outlined.Autorenew
+    val Delete = Icons.Outlined.Delete
 }

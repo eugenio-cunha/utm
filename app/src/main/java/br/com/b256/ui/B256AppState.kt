@@ -4,22 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import br.com.b256.navigation.B256Destination
-import kotlinx.coroutines.CoroutineScope
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.navOptions
 import br.com.b256.core.common.monitor.NetworkMonitor
 import br.com.b256.core.common.monitor.TimeZoneMonitor
-import br.com.b256.feature.home.navigation.navigateToHome
+import br.com.b256.feature.utm.navigation.navigateToUtm
+import br.com.b256.navigation.B256Destination
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.TimeZone
-import androidx.navigation.navOptions
-import br.com.b256.feature.place.navigation.navigateToPlace
 
 @Composable
 fun rememberB256AppState(
@@ -99,11 +98,8 @@ class B256AppState(
         }
 
         when (destination) {
-            B256Destination.PLACE -> navController.navigateToPlace(options)
-            B256Destination.HOME -> navController.navigateToHome(options)
+            B256Destination.UTM -> navController.navigateToUtm(options)
         }
     }
-
-    fun navigateToHome() = navController.navigateToHome()
 }
 

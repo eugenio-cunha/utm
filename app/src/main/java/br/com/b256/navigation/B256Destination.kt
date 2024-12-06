@@ -4,8 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import br.com.b256.R
 import br.com.b256.core.designsystem.icon.B256Icons
-import br.com.b256.feature.home.navigation.HomeRoute
-import br.com.b256.feature.place.navigation.PlaceRoute
+import br.com.b256.feature.utm.navigation.UtmRoute
 import kotlin.reflect.KClass
 
 enum class B256Destination(
@@ -13,14 +12,9 @@ enum class B256Destination(
     @StringRes val titleTextId: Int,
     val route: KClass<*>,
 ) {
-    PLACE(
+    UTM(
         icon = B256Icons.Place,
         titleTextId = R.string.app_place,
-        route = PlaceRoute::class
+        route = UtmRoute::class,
     ),
-    HOME(
-        icon = B256Icons.Home,
-        titleTextId = R.string.app_name,
-        route = HomeRoute::class
-    )
 }

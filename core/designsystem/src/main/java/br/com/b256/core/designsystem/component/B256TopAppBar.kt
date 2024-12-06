@@ -24,7 +24,7 @@ fun B256TopAppBar(
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
     actionIcon: ImageVector? = null,
     onActionClick: (() -> Unit)? = null,
-    onNavigationClick: () -> Unit = {},
+    onNavigationClick: (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier.testTag("B256TopAppBar"),
@@ -46,13 +46,40 @@ fun B256TopAppBar(
                 }
         },
         navigationIcon = {
-            IconButton(onClick = onNavigationClick) {
+            if (onNavigationClick != null) {
+                IconButton(onClick = onNavigationClick) {
+                    Icon(
+                        imageVector = B256Icons.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun B256TopAppBar(
+    modifier: Modifier = Modifier,
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    actionIcon: ImageVector,
+    onActionClick: (() -> Unit),
+) {
+    CenterAlignedTopAppBar(
+        modifier = modifier.testTag("B256TopAppBar"),
+        title = {},
+        colors = colors,
+        actions = {
+            IconButton(onClick = onActionClick) {
                 Icon(
-                    imageVector = B256Icons.ArrowBack,
+                    imageVector = actionIcon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         },
+        navigationIcon = {},
     )
 }

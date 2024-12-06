@@ -38,8 +38,6 @@ include(":core:network")
 include(":core:ui")
 include(":core:notification")
 
-include(":feature:home")
 include(":feature:settings")
 include(":core:service")
-include(":feature:place")
 include(":feature:utm")
