@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="feature_place_search">Pesquisar</string>
-    <string name="feature_place_altitude">Altitude</string>
-    <string name="feature_place_accuracy">Precisão</string>
-    <string name="feature_place_latitude">Latitude</string>
-    <string name="feature_place_longitude">Longitude</string>
-    <string name="feature_place_unknown">Desconhecido</string>
-</resources>
