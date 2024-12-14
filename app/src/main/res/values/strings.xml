@@ -1,7 +1,4 @@
 <resources>
-    <string name="app_name">UTM Grid</string>
-    <string name="app_offline">⚠️ Você não está conectado à internet</string>
-    <string name="app_place">Pontos</string>
-    <string name="app_settings">Configurações</string>
-    <string name="app_mapped">Mapeado</string>
+    <string name="app_name">UTM</string>
+    <string name="app_offline">⚠️ You are not connected to the internet.</string>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_utm_meters">%1dm</string>
-    <string name="feature_utm_altitude">Elevação</string>
-    <string name="feature_utm_accuracy">Precisão</string>
+    <string name="feature_utm_altitude">Altitude</string>
+    <string name="feature_utm_accuracy">Accuracy</string>
 </resources>
