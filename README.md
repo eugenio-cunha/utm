@@ -1,4 +1,4 @@
-UTM Grid App
+UTM App
 ===============
 Aplicativos de navegação móvel e GPS
 
