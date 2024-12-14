@@ -52,7 +52,7 @@ class UtmViewModel @Inject constructor(
             ?.launchIn(viewModelScope)
     }
 
-    private fun startService() {
+    fun startService() {
         Intent(application, LocationService::class.java).also {
             application.startForegroundService(it)
             application.bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)

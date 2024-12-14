@@ -167,13 +167,15 @@ class LocationService : Service(), LocationListener {
                     )
                 }
             }
+        } else {
+            Permission.checkPermission(applicationContext)
         }
     }
 
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             channelId,
-            "Location Service Channel",
+            "UTM Service Channel",
             NotificationManager.IMPORTANCE_DEFAULT,
         )
         val manager = getSystemService(NotificationManager::class.java)
@@ -181,8 +183,8 @@ class LocationService : Service(), LocationListener {
         startForeground(
             notificationId,
             NotificationCompat.Builder(this, channelId)
-                .setContentTitle("Location Tracking")
-                .setContentText("Tracking your location...")
+                .setContentTitle("UTM Location")
+                .setContentText("UTM (Universal Transversa Mercator)")
                 .setSmallIcon(R.drawable.ic_location)
                 .build(),
         )

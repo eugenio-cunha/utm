@@ -13,6 +13,8 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.service)
 
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.robolectric)
     testImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.bundles.androidx.compose.ui.test)

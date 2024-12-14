@@ -1,5 +1,6 @@
 package br.com.b256.feature.utm
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -17,10 +18,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,12 +32,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.b256.core.designsystem.icon.B256Icons
 import br.com.b256.core.designsystem.theme.PaddingHalf
 import br.com.b256.core.gps.extension.UTM
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 @Composable
 internal fun UtmScreen(
     modifier: Modifier = Modifier,
     viewModel: UtmViewModel = hiltViewModel(),
 ) {
+    LocationPermissionEffect {
+        viewModel.startService()
+    }
+
     val context = LocalContext.current
     val location by viewModel.location.collectAsStateWithLifecycle()
 
@@ -145,6 +154,30 @@ private fun UtmScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun LocationPermissionEffect(callback: () -> Unit) {
+    if (LocalInspectionMode.current) return
+
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+        ),
+        onPermissionsResult = { result ->
+            if (result.values.all { it }) {
+                callback()
+            }
+        }
+    )
+
+    LaunchedEffect(permissionState) {
+        if (!permissionState.allPermissionsGranted) {
+            permissionState.launchMultiplePermissionRequest()
+        }
+    }
+}
 
 private fun share(context: Context, value: String) {
     val sendIntent: Intent = Intent().apply {
