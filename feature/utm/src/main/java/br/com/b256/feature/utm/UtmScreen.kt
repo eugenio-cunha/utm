@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -154,31 +155,59 @@ private fun UtmScreen(
     }
 }
 
+/**
+ * Função Composable que lida com as solicitações de permissão de localização.
+ *
+ * Esta função verifica as permissões de localização necessárias (ACCESS_FINE_LOCATION,
+ * ACCESS_COARSE_LOCATION e FOREGROUND_SERVICE_LOCATION para Android U e superior).
+ * Se as permissões não forem concedidas, ela inicia uma solicitação de permissão.
+ * Assim que todas as permissões forem concedidas, ela executa a lambda [onPermissionGranted].
+ *
+ * Esta função não faz nada se estiver em execução no modo de inspeção (por exemplo, no Android Studio Layout Editor).
+ *
+ * @param onPermissionGranted Uma função lambda a ser executada quando todas as permissões de localização necessárias forem concedidas.
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun LocationPermissionEffect(callback: () -> Unit) {
+fun LocationPermissionEffect(onPermissionGranted: () -> Unit) {
     if (LocalInspectionMode.current) return
 
+    val permissions = buildList {
+        add(Manifest.permission.ACCESS_FINE_LOCATION)
+        add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            add(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+        }
+    }
+
     val permissionState = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ),
+        permissions = permissions,
         onPermissionsResult = { result ->
             if (result.values.all { it }) {
-                callback()
+                onPermissionGranted()
             }
-        }
+        },
     )
 
     LaunchedEffect(permissionState) {
-        if (!permissionState.allPermissionsGranted) {
+        if (permissionState.allPermissionsGranted) {
+            onPermissionGranted()
+        } else {
             permissionState.launchMultiplePermissionRequest()
         }
     }
 }
 
+/**
+ * Compartilha o [value] informado usando uma Intent do Android.
+ *
+ * Esta função cria uma Intent com a ação `Intent.ACTION_SEND` e define o tipo como "text/plain".
+ * O [value] é adicionado como um extra com a chave `Intent.EXTRA_TEXT`.
+ * Em seguida, cria um seletor para a Intent e inicia a atividade.
+ *
+ * @param context O [Context] usado para iniciar a atividade.
+ * @param value O valor [String] a ser compartilhado.
+ */
 private fun share(context: Context, value: String) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
