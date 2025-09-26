@@ -1,0 +1,14 @@
+# ninja log v5
+0	820	1752869417526656152	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+821	945	1752869417656203308	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843
+3	888	1752869900847676451	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+888	997	1752869900963653574	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843
+4	713	1752869975062476128	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+714	859	1752869975208271532	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843
+2	879	1752870165376486108	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+879	992	1752870165494225168	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843
+0	26	0	clean	6d86df58e237dbfc
+2	1032	1752870260442169411	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+1032	1197	1752870260609336080	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843
+4	924	1756333336256315649	CMakeFiles/toolbox.dir/toolbox.cpp.o	80ca032b02949c61
+924	2032	1756333337368194211	/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/arm64-v8a/libtoolbox.so	3ae37f4f6006a843

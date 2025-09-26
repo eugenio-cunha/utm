@@ -1,0 +1,18 @@
+                        -H/Users/genio/B256/utm/core/toolbox/src/main/cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=27
+-DANDROID_PLATFORM=android-27
+-DANDROID_ABI=x86
+-DCMAKE_ANDROID_ARCH_ABI=x86
+-DANDROID_NDK=/Users/genio/Library/Android/sdk/ndk/26.1.10909125
+-DCMAKE_ANDROID_NDK=/Users/genio/Library/Android/sdk/ndk/26.1.10909125
+-DCMAKE_TOOLCHAIN_FILE=/Users/genio/Library/Android/sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/x86
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/x86
+-DCMAKE_BUILD_TYPE=Debug
+-B/Users/genio/B256/utm/core/toolbox/.cxx/Debug/2e3g2f53/x86
+-GNinja
+                        Build command args: []
+                        Version: 2

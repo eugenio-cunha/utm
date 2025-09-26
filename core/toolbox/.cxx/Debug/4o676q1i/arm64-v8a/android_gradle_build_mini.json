@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/genio/B256/utm/core/toolbox/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/4o676q1i/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/4o676q1i/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "toolbox::@6890427a1f51a3e7e1df": {
+      "artifactName": "toolbox",
+      "abi": "arm64-v8a",
+      "output": "/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/4o676q1i/obj/arm64-v8a/libtoolbox.so",
+      "runtimeFiles": []
+    }
+  }
+}

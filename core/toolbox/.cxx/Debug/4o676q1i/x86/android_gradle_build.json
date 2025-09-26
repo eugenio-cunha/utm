@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "/Users/genio/B256/utm/core/toolbox/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/4o676q1i/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/4o676q1i/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "toolbox::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "toolbox",
+      "output": "/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/4o676q1i/obj/x86/libtoolbox.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/genio/Library/Android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/genio/Library/Android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

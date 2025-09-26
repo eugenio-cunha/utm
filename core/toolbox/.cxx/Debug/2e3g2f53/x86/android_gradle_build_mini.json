@@ -1,0 +1,29 @@
+{
+  "buildFiles": [
+    "/Users/genio/B256/utm/core/toolbox/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/2e3g2f53/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/genio/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/genio/B256/utm/core/toolbox/.cxx/Debug/2e3g2f53/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "toolbox::@6890427a1f51a3e7e1df": {
+      "artifactName": "toolbox",
+      "abi": "x86",
+      "output": "/Users/genio/B256/utm/core/toolbox/build/intermediates/cxx/Debug/2e3g2f53/obj/x86/libtoolbox.so",
+      "runtimeFiles": [
+        "/Users/genio/B256/utm/core/toolbox/src/main/cpp/jniLibs/x86/libturbojpeg.so"
+      ]
+    }
+  }
+}
