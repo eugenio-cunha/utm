@@ -20,6 +20,7 @@ dependencies {
     api(libs.androidx.compose.runtime)
     api(libs.androidx.compose.ui.util)
 
+    implementation(libs.androidx.core.ktx)
     implementation(libs.coil.kt.compose)
 
     testImplementation(libs.androidx.compose.ui.test)

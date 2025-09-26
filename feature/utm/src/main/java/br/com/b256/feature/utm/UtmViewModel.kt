@@ -7,16 +7,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.location.Location
+import android.net.Uri
 import android.os.IBinder
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.b256.core.gps.service.LocationService
+import br.com.b256.core.toolbox.NativeLib
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -122,4 +126,14 @@ class UtmViewModel @Inject constructor(private val application: Application) : V
 
         stopService()
     }
+
+    fun onPictureSuccess(value: ByteArray): ByteArray? {
+        return NativeLib().compress(input = value)
+    }
+
+    fun onPictureFailure(message: String) {
+        Log.d("ON_PICTURE_FAILURE", message)
+    }
+
+    fun onPermissionDenied() {}
 }

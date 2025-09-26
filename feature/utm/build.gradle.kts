@@ -12,6 +12,7 @@ dependencies {
     implementation(projects.core.common)
     implementation(projects.core.model)
     implementation(projects.core.service)
+    implementation(projects.core.toolbox)
 
     implementation(libs.accompanist.permissions)
 

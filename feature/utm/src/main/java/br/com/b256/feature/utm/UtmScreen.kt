@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,8 +34,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.b256.core.designsystem.icon.B256Icons
 import br.com.b256.core.designsystem.theme.PaddingHalf
 import br.com.b256.core.gps.extension.UTM
+import br.com.b256.core.toolbox.NativeLib
+import br.com.b256.core.ui.component.rememberTakePictureFlow
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import java.io.File
 
 @Composable
 internal fun UtmScreen(
@@ -52,8 +56,12 @@ internal fun UtmScreen(
         modifier = modifier,
         location = location,
         onShare = {
-            share(context = context, value = it)
+
+//            share(context = context, value = it)
         },
+        onPictureSuccess = viewModel::onPictureSuccess,
+        onPictureFailure = viewModel::onPictureFailure,
+        onPermissionDenied = viewModel::onPermissionDenied,
     )
 }
 
@@ -62,14 +70,32 @@ private fun UtmScreen(
     modifier: Modifier = Modifier,
     location: Location?,
     onShare: (String) -> Unit,
+    onPictureSuccess: (ByteArray) -> ByteArray?,
+    onPictureFailure: (String) -> Unit,
+    onPermissionDenied: () -> Unit,
 ) {
+    val context: Context = LocalContext.current
+    val takePictureFLow = rememberTakePictureFlow(
+        context = context,
+        onSuccess = { uri ->
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                onPictureSuccess(stream.readBytes())?.let { output ->
+                    context.contentResolver.openOutputStream(uri)?.use { it.write(output) }
+                }
+            }
+        },
+        onFailure = onPictureFailure,
+        onPermissionDenied = onPermissionDenied,
+    )
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    location?.UTM?.also {
-                        onShare("${it.zone} ${it.easting} ${it.northing}")
-                    }
+//                    location?.UTM?.also {
+//                        onShare("${it.zone} ${it.easting} ${it.northing}")
+//                    }
+                    takePictureFLow.launch()
                 },
             ) {
                 Icon(
@@ -208,14 +234,14 @@ fun LocationPermissionEffect(onPermissionGranted: () -> Unit) {
  * @param context O [Context] usado para iniciar a atividade.
  * @param value O valor [String] a ser compartilhado.
  */
-private fun share(context: Context, value: String) {
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, value)
-        type = "text/plain"
-    }
-
-    Intent.createChooser(sendIntent, null).also {
-        context.startActivity(it)
-    }
-}
+//private fun share(context: Context, value: String) {
+//    val sendIntent: Intent = Intent().apply {
+//        action = Intent.ACTION_SEND
+//        putExtra(Intent.EXTRA_TEXT, NativeLib().stringFromJNI())
+//        type = "text/plain"
+//    }
+//
+//    Intent.createChooser(sendIntent, null).also {
+//        context.startActivity(it)
+//    }
+//}
