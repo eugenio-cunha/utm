@@ -78,8 +78,9 @@ private fun LazyListScope.toLazyViewScope() = object : LazyViewScope {
     ) = this@toLazyViewScope.stickyHeader(
         key = key,
         contentType = contentType,
-        content = content,
-    )
+    ) {
+        content()
+    }
 }
 
 fun LazyViewScope.item(
