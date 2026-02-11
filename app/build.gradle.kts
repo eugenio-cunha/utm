@@ -14,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "br.com.b256.utm"
-        versionCode = 45
-        versionName = "1.0.2" // X.Y.Z; X = Major, Y = minor, Z = Patch level
+        versionCode = 46
+        versionName = "1.0.3" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
