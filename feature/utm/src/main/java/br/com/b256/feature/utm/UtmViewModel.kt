@@ -8,13 +8,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.location.Location
 import android.os.IBinder
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.b256.core.gps.service.LocationService
+import br.com.b256.core.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -29,24 +26,10 @@ import javax.inject.Inject
  * @property application O contexto da aplicação.
  */
 @HiltViewModel
-class UtmViewModel @Inject constructor(private val application: Application) : ViewModel() {
+internal class UtmViewModel @Inject constructor(private val application: Application) :
+    BaseViewModel<UtmUiIntent, UtmUiState, UtmUiEffect>(initialState = UtmUiState()) {
     @SuppressLint("StaticFieldLeak")
     private var locationService: LocationService? = null
-
-    /**
-     * Um [MutableStateFlow] que mantém a localização atual.
-     * É anulável para representar o caso em que a localização ainda não está disponível.
-     */
-    private val _location = MutableStateFlow<Location?>(null)
-
-    /**
-     * Um [StateFlow] que emite a localização atual, ou `null` se a localização ainda não estiver
-     * disponível ou se o serviço de localização não estiver conectado.
-     *
-     * Este fluxo pode ser observado por componentes de IU para exibir a localização atual ou reagir a
-     * mudanças de localização.
-     */
-    val location: StateFlow<Location?> = _location.asStateFlow()
 
     /**
      * ServiceConnection para vincular ao LocationService.
@@ -79,7 +62,7 @@ class UtmViewModel @Inject constructor(private val application: Application) : V
     private fun startCollectingLocationUpdates() {
         locationService?.locationUpdatesFlow()
             ?.onEach { location ->
-                _location.value = location
+                reduce { copy(location = location) }
             }
             ?.launchIn(viewModelScope)
     }
@@ -110,6 +93,18 @@ class UtmViewModel @Inject constructor(private val application: Application) : V
     }
 
     /**
+     * Dispara um efeito de compartilhamento com o valor fornecido.
+     *
+     * Envia um [UtmUiEffect.Share] para ser processado pela UI, permitindo que o usuário
+     * compartilhe as coordenadas ou informações formatadas.
+     *
+     * @param value O conteúdo textual a ser compartilhado.
+     */
+    private fun onShare(value: String) {
+        sendEffect(UtmUiEffect.Share(value = value))
+    }
+
+    /**
      * Este método será chamado quando este ViewModel não for mais usado e será destruído.
      * É útil quando o ViewModel observa alguns dados e você precisa limpar esta inscrição para
      * evitar um vazamento deste ViewModel.
@@ -121,5 +116,20 @@ class UtmViewModel @Inject constructor(private val application: Application) : V
         super.onCleared()
 
         stopService()
+    }
+
+    /**
+     * Processa as intenções (intents) enviadas pela UI e dispara a ação correspondente.
+     *
+     * @param intent A intenção do usuário ou evento da interface a ser processado,
+     * como iniciar/parar o serviço ou compartilhar dados.
+     */
+    override suspend fun handleIntent(intent: UtmUiIntent) {
+        when (intent) {
+            UtmUiIntent.Cleared -> onCleared()
+            UtmUiIntent.StartService -> startService()
+            UtmUiIntent.StopService -> stopService()
+            is UtmUiIntent.Share -> onShare(value = intent.value)
+        }
     }
 }

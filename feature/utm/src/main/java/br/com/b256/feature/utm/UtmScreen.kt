@@ -3,7 +3,6 @@ package br.com.b256.feature.utm
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,39 +35,65 @@ import br.com.b256.core.gps.extension.UTM
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
+/**
+ * Composable que representa a tela principal para exibição de coordenadas UTM.
+ *
+ * Esta tela é responsável por observar o estado da interface vindo do [UtmViewModel],
+ * lidar com efeitos colaterais como o compartilhamento de coordenadas e gerenciar
+ * solicitações de permissão de localização. Utiliza o [LocationPermissionEffect] para
+ * garantir que as permissões necessárias sejam concedidas antes de iniciar o serviço
+ * de localização. A interface real é delegada para uma função `UtmScreen` privada.
+ *
+ * @param modifier O modificador a ser aplicado à tela.
+ * @param viewModel O [UtmViewModel] responsável por gerenciar o estado e a lógica da tela.
+ *                  Injetado automaticamente via Hilt.
+ */
 @Composable
 internal fun UtmScreen(
     modifier: Modifier = Modifier,
     viewModel: UtmViewModel = hiltViewModel(),
 ) {
-    LocationPermissionEffect {
-        viewModel.startService()
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is UtmUiEffect.Share -> share(context = context, effect.value)
+            }
+        }
     }
 
-    val context = LocalContext.current
-    val location by viewModel.location.collectAsStateWithLifecycle()
+    LocationPermissionEffect {
+        viewModel.dispatch(intent = UtmUiIntent.StartService)
+    }
 
     UtmScreen(
         modifier = modifier,
-        location = location,
-        onShare = {
-            share(context = context, value = it)
-        },
+        uiState = uiState,
+        dispatch = viewModel::dispatch,
     )
 }
 
+/**
+ * Ponto de entrada da tela UTM. Esta função gerencia o estado da interface, lida com efeitos colaterais
+ * de compartilhamento, solicita permissões de localização e inicia o serviço de rastreamento.
+ *
+ * @param modifier [Modifier] a ser aplicado ao layout da tela.
+ * @param viewModel O [UtmViewModel] que fornece o estado e gerencia a lógica de negócio.
+ */
 @Composable
 private fun UtmScreen(
     modifier: Modifier = Modifier,
-    location: Location?,
-    onShare: (String) -> Unit,
+    uiState: UtmUiState,
+    dispatch: (intent: UtmUiIntent) -> Unit,
 ) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    location?.UTM?.also {
-                        onShare("${it.zone} ${it.easting} ${it.northing}")
+                    uiState.location?.UTM?.also {
+                        dispatch(UtmUiIntent.Share(value = "${it.zone} ${it.easting} ${it.northing}"))
                     }
                 },
             ) {
@@ -91,7 +116,7 @@ private fun UtmScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                location?.UTM?.let {
+                uiState.location?.UTM?.let {
                     Text(
 
                         text = it.zone,
@@ -112,7 +137,7 @@ private fun UtmScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                location?.let {
+                uiState.location?.let {
                     Column(
                         modifier = Modifier.padding(PaddingHalf),
                     ) {
