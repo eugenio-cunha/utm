@@ -1,6 +1,4 @@
 import br.com.b256.extension.B256BuildType
-import br.com.b256.extension.getVersionCode
-import br.com.b256.extension.getVersionName
 
 plugins {
     alias(libs.plugins.b256.android.application)
@@ -16,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "br.com.b256.utm"
-        versionCode = 44
-        versionName = "1.0.1"
+        versionCode = 45
+        versionName = "1.0.2" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -45,11 +43,7 @@ android {
         }
     }
 
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {

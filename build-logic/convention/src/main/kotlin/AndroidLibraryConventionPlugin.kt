@@ -1,13 +1,14 @@
-import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.LibraryExtension
 import br.com.b256.extension.configureFlavors
 import br.com.b256.extension.configureGradleManagedDevices
 import br.com.b256.extension.configureKotlinAndroid
 import br.com.b256.extension.configurePrintApksTask
 import br.com.b256.extension.disableUnnecessaryAndroidTests
 import br.com.b256.extension.libs
+import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
@@ -15,15 +16,12 @@ import org.gradle.kotlin.dsl.kotlin
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            with(pluginManager) {
-                apply("com.android.library")
-                apply("org.jetbrains.kotlin.android")
-                apply("b256.android.lint")
-            }
+            apply(plugin = "com.android.library")
+            apply(plugin = "b256.android.lint")
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
+//                defaultConfig.targetSdk = 36
                 defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 testOptions.animationsDisabled = true
                 configureFlavors(this)

@@ -1,5 +1,5 @@
-import com.android.build.gradle.LibraryExtension
 import br.com.b256.extension.configureAndroidCompose
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -15,5 +15,4 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
             configureAndroidCompose(extension)
         }
     }
-
 }

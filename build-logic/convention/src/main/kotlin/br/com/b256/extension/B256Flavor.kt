@@ -4,6 +4,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.ApplicationProductFlavor
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.ProductFlavor
+import org.gradle.kotlin.dsl.invoke
 
 @Suppress("EnumEntryName")
 enum class FlavorDimension {
@@ -20,19 +21,23 @@ enum class B256Flavor(val dimension: FlavorDimension, val applicationIdSuffix: S
 }
 
 fun configureFlavors(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-    flavorConfigurationBlock: ProductFlavor.(flavor: B256Flavor) -> Unit = {}
+    commonExtension: CommonExtension,
+    flavorConfigurationBlock: ProductFlavor.(flavor: B256Flavor) -> Unit = {},
 ) {
     commonExtension.apply {
-        flavorDimensions += FlavorDimension.contentType.name
+        FlavorDimension.entries.forEach { flavorDimension ->
+            flavorDimensions += flavorDimension.name
+        }
+
         productFlavors {
-            B256Flavor.values().forEach {
-                create(it.name) {
-                    dimension = it.dimension.name
-                    flavorConfigurationBlock(this, it)
-                    if (this@apply is ApplicationExtension && this is ApplicationProductFlavor) {
-                        if (it.applicationIdSuffix != null) {
-                            applicationIdSuffix = it.applicationIdSuffix
+            B256Flavor.entries.forEach { flavor ->
+
+                register(flavor.name) {
+                    dimension = flavor.dimension.name
+                    flavorConfigurationBlock(this, flavor)
+                    if (commonExtension is ApplicationExtension && this is ApplicationProductFlavor) {
+                        if (flavor.applicationIdSuffix != null) {
+                            applicationIdSuffix = flavor.applicationIdSuffix
                         }
                     }
                 }
