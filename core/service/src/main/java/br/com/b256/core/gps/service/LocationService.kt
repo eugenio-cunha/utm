@@ -185,7 +185,7 @@ class LocationService : Service(), LocationListener {
             NotificationCompat.Builder(this, channelId)
                 .setContentTitle("UTM Location")
                 .setContentText("UTM (Universal Transversa Mercator)")
-                .setSmallIcon(R.drawable.ic_location)
+                .setSmallIcon(R.drawable.core_service_point)
                 .build(),
         )
     }
