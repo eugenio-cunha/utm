@@ -8,8 +8,10 @@ android {
 }
 
 dependencies {
-    api(libs.kotlinx.datetime)
     implementation(projects.core.designsystem)
+
+    api(libs.kotlinx.datetime)
+    implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.camera)
     implementation(libs.androidx.camera.core)
