@@ -27,13 +27,13 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.b256.core.designsystem.icon.B256Icons
 import br.com.b256.core.designsystem.theme.PaddingHalf
 import br.com.b256.core.gps.extension.UTM
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 /**
  * Composable que representa a tela principal para exibição de coordenadas UTM.
@@ -190,7 +190,7 @@ private fun UtmScreen(
  *
  * Esta função não faz nada se estiver em execução no modo de inspeção (por exemplo, no Android Studio Layout Editor).
  *
- * @param onPermissionGranted Uma função lambda a ser executada quando todas as permissões de localização necessárias forem concedidas.
+ * @param onPermissionGranted Uma função, lambda a ser executada quando todas as permissões de localização necessárias forem concedidas.
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
