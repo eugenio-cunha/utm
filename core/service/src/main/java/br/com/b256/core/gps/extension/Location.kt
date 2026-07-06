@@ -2,10 +2,10 @@ package br.com.b256.core.gps.extension
 
 import android.location.Location
 import br.com.b256.core.gps.LocaleHelper
-import br.com.b256.core.gps.model.UTM
+import br.com.b256.core.model.UTM
 import gov.nasa.worldwind.geom.Angle
 import gov.nasa.worldwind.geom.coords.UTMCoord
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime

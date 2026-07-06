@@ -88,6 +88,7 @@ internal fun B256App(
         modifier = modifier,
         topBar = {
             B256TopAppBar(
+                title = R.string.app_name,
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent,
                 ),

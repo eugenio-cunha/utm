@@ -1,5 +1,7 @@
 package br.com.b256.core.data.di
 
+import br.com.b256.core.data.repository.LocationRepository
+import br.com.b256.core.data.repository.LocationRepositoryImpl
 import br.com.b256.core.data.repository.NetworkRepository
 import br.com.b256.core.data.repository.NetworkRepositoryImpl
 import br.com.b256.core.data.repository.PlaceRepository
@@ -8,6 +10,7 @@ import br.com.b256.core.data.repository.SettingsRepository
 import br.com.b256.core.data.repository.SettingsRepositoryImpl
 import br.com.b256.core.database.RoomDatabase
 import br.com.b256.core.datastore.Preference
+import br.com.b256.core.gps.LocationProvider
 import br.com.b256.core.network.service.Service
 import dagger.Module
 import dagger.Provides
@@ -32,4 +35,9 @@ class DataModule {
     @Singleton
     internal fun providesPlaceRepository(database: RoomDatabase): PlaceRepository =
         PlaceRepositoryImpl(database = database)
+
+    @Provides
+    @Singleton
+    internal fun providesLocationRepository(provider: LocationProvider): LocationRepository =
+        LocationRepositoryImpl(provider = provider)
 }
