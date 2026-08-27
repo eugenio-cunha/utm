@@ -1,7 +1,60 @@
 # https://editorconfig.org/
-# This configuration is used by ktlint when spotless invokes it
+# Esta configuração é usada pelo ktlint quando o Spotless o invoca (ver `SpotlessConventionPlugin`,
+# aplicado a todo subprojeto pelo `RootPlugin` — rode `./gradlew spotlessCheck`/`spotlessApply`).
+# As mesmas chaves também guiam a formatação automática do IntelliJ/Android Studio (`ij_kotlin_*`),
+# então IDE e ktlint concordam sobre o estilo do código.
 
 [*.{kt,kts}]
+
+# Propriedades do formatador Kotlin do IntelliJ/Android Studio (prefixo `ij_kotlin_`, não são
+# regras do ktlint) — mantidas em sincronia com as regras `ktlint_standard_allow-trailing-comma*`
+# abaixo para o IDE e o ktlint não divergirem sobre onde inserir vírgulas finais.
+
+# Permite (não obriga) vírgula final em declarações multilinha (parâmetros de função, listas de
+# argumentos de construtor, elementos de coleção, etc.) quando o IDE reformata o código.
 ij_kotlin_allow_trailing_comma=true
+# Mesma permissão acima, mas especificamente no *local de chamada* (ex.: argumentos passados numa
+# chamada de função multilinha), que o Kotlin trata como uma configuração separada.
 ij_kotlin_allow_trailing_comma_on_call_site=true
+
+# Regra padrão do ktlint que exige nomes de função em camelCase. A propriedade abaixo isenta dessa
+# checagem qualquer função anotada com @Composable ou @Test — comum porque composables (padrão
+# PascalCase, por convenção do Compose) e métodos de teste (frases entre crase, como usamos neste
+# projeto, ex.: `` `getTheme retorna o tema salvo` ``) legitimamente fogem do camelCase.
 ktlint_function_naming_ignore_when_annotated_with=Composable, Test
+
+# As regras `ktlint_standard_*` abaixo estão todas **desabilitadas** — ou seja, o projeto optou
+# por não aplicar essas formatações específicas do estilo "oficial" do ktlint. Cada uma, se
+# habilitada, faria o seguinte:
+
+# Só permitiria nome de propriedade começando com `_` (ex.: `_uiState`) quando existir uma
+# propriedade/função pública correspondente sem o underscore (o padrão "backing property" usado
+# para expor, por ex., um `MutableStateFlow` privado como `StateFlow` público).
+ktlint_standard_backing-property-naming = disabled
+# Quebraria expressões binárias longas (ex.: `a + b + c`) na posição do operador quando não
+# couberem na linha.
+ktlint_standard_binary-expression-wrapping = disabled
+# Exigiria que os operadores de encadeamento (`.` ou `?.`) de uma chamada em cadeia multilinha
+# (ex.: `a.b().c().d()` quebrado em várias linhas) fiquem alinhados entre si.
+ktlint_standard_chain-method-continuation = disabled
+# Reescreveria a assinatura de `class`/`constructor` para caber numa linha quando possível, ou a
+# quebraria em múltiplas linhas de forma consistente quando não coubesse.
+ktlint_standard_class-signature = disabled
+# Padronizaria a quebra de condições multilinha com `&&`/`||` (ex.: dentro de `if`/`while`),
+# colocando cada operando em sua própria linha.
+ktlint_standard_condition-wrapping = disabled
+# Reescreveria uma função cujo corpo é só um `return`/`throw` para a forma de "expression body"
+# (`fun foo() = ...` em vez de `fun foo() { return ... }`).
+ktlint_standard_function-expression-body = disabled
+# Padronizaria a formatação de lambdas (function literals): parâmetros e `->` na mesma linha da
+# chave de abertura quando couberem, ou cada parâmetro em sua própria linha quando não couberem.
+ktlint_standard_function-literal = disabled
+# Exigiria exatamente um espaço entre modificadores (ex.: `suspend`) e um tipo de função (ex.:
+# `() -> Unit`).
+ktlint_standard_function-type-modifier-spacing = disabled
+# Exigiria chaves `{ }` em laços `for`/`while`/`do` multilinha, mesmo quando o corpo é uma única
+# instrução.
+ktlint_standard_multiline-loop = disabled
+# Reescreveria a assinatura de função para caber numa linha quando possível, ou a quebraria em
+# múltiplas linhas de forma consistente (um parâmetro por linha) quando não coubesse.
+ktlint_standard_function-signature = disabled

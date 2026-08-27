@@ -1,10 +1,6 @@
-UTM App
+GNSS
 ===============
 Aplicativos de navegação móvel e GPS
-
-# Módulo :App
-## Gráfico de dependência
-![Gráfico de dependência](docs/images/graphs/dep_graph_app.svg)
 
 ## Stack
 * [MVVM]
