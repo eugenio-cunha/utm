@@ -7,7 +7,7 @@ import kotlin.time.Instant
 
 /**
  * Modelo de linha da tabela `telemetry` (formato de banco), convertido para a entidade de
- * domínio [br.com.b256.domain.entities.Telemetry] pelo mapper em `database/mapper/TelemetryMapper.kt`.
+ * domínio [Telemetry] pelo mapper em `database/mapper/TelemetryMapper.kt`.
  */
 @Entity(
     tableName = "telemetry",

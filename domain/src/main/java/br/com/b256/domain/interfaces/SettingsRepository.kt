@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
  * Contrato de repository do `:domain`, exemplo de referência para novos repositories.
  *
  * O `:domain` só declara a interface; a implementação concreta fica em `:data`
- * ([br.com.b256.data.repositories.SettingsRepositoryImpl]) e é exposta via Hilt `@Binds`
+ * ([SettingsRepositoryImpl]) e é exposta via Hilt `@Binds`
  * (`data/di/RepositoryModule.kt`). Isso mantém o `:domain` sem depender de nenhum detalhe de
  * infraestrutura (DataStore, Room, Retrofit, ...).
  */

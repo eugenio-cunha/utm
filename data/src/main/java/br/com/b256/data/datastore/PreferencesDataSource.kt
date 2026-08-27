@@ -13,7 +13,7 @@ import kotlin.time.Instant
 
 /**
  * Fonte de dados de referência sobre Jetpack DataStore (Preferences). Consumida por
- * [br.com.b256.data.repositories.SettingsRepositoryImpl]; uma nova preferência simples (flags,
+ * [SettingsRepositoryImpl]; uma nova preferência simples (flags,
  * strings, etc.) deveria ganhar uma chave em [PreferencesKeys] e os respectivos getter/setter
  * aqui, em vez de acessar o [DataStore] diretamente de fora deste arquivo.
  */

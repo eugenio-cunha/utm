@@ -27,6 +27,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material3)
     implementation(projects.presentation)
     implementation(projects.domain)
     implementation(projects.data)

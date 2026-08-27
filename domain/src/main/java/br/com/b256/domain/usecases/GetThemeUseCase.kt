@@ -5,18 +5,25 @@ import br.com.b256.domain.interfaces.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+
 /**
- * Exemplo de referência para casos de uso do `:domain`.
+ * Caso de uso responsável por recuperar o tema atual do aplicativo.
  *
- * Convenção do projeto: um caso de uso é uma classe com um único método público,
- * `operator fun invoke()`, injetada via construtor e usada como `useCase()` a partir de um
- * `ViewModel` (ver [br.com.b256.gnss.MainActivityViewModel]). Um caso de uso não deve conter
- * lógica de UI nem detalhes de infraestrutura — apenas orquestrar repositories do `:domain`.
+ * Este caso de uso interage com o [SettingsRepository] para fornecer um fluxo ([Flow])
+ * reativo do enum [Theme], permitindo que a interface do usuário observe e reaja a
+ * mudanças de tema em tempo real.
+ *
+ * @property repository O repositório utilizado para acessar as configurações do usuário.
  */
 class GetThemeUseCase
-    @Inject
-    constructor(
-        private val repository: SettingsRepository,
-    ) {
-        operator fun invoke(): Flow<Theme> = repository.getTheme()
-    }
+@Inject
+constructor(
+    private val repository: SettingsRepository,
+) {
+    /**
+     * Executa o caso de uso para recuperar a preferência de tema atual.
+     *
+     * @return Um [Flow] que emite o [Theme] selecionado e suas atualizações futuras.
+     */
+    operator fun invoke(): Flow<Theme> = repository.getTheme()
+}

@@ -18,6 +18,7 @@ import androidx.core.util.Consumer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import br.com.b256.gnss.ui.B256App
 import br.com.b256.presentation.designsystem.theme.B256Theme
 import br.com.b256.presentation.navigation.B256NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             B256Theme(darkTheme = themeSettings) {
-                B256NavDisplay(modifier = Modifier.fillMaxSize())
+                B256App()
             }
         }
     }

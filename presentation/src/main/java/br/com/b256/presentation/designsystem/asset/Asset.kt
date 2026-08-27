@@ -2,6 +2,7 @@ package br.com.b256.presentation.designsystem.asset
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Settings
 
 /**
  * Registro centralizado de recursos visuais (assets) dentro do design system.
@@ -13,4 +14,5 @@ import androidx.compose.material.icons.outlined.Add
  */
 object Asset {
     val Add = Icons.Outlined.Add
+    val Settings = Icons.Outlined.Settings
 }

@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 
 /**
  * `@TypeConverter` do Room para persistir [kotlinx.datetime.Instant] como `Long` (epoch millis).
- * Registrado via `@TypeConverters(InstantConverter::class)` em [br.com.b256.data.database.RoomDatabase].
+ * Registrado via `@TypeConverters(InstantConverter::class)` em [RoomDatabase].
  */
 internal class InstantConverter {
     @TypeConverter

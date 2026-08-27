@@ -1,4 +1,4 @@
-package br.com.b256.presentation.home
+package br.com.b256.presentation.skyplot
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -9,7 +9,7 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Teste de referência de UI em Compose: exercita a versão "stateless" de [HomeScreen]
+ * Teste de referência de UI em Compose: exercita a versão "stateless" de [SkyPlotScreen]
  * (ver `HomeScreen.kt`), sem precisar de Hilt/ViewModel, e verifica o comportamento via semantics
  * (`onNodeWithText`) em vez de referências diretas a componentes internos.
  */
@@ -20,7 +20,7 @@ class HomeScreenTest {
     @Test
     fun exibeOTextoDaTela() {
         composeTestRule.setContent {
-            HomeScreen(onClick = {})
+            SkyPlotScreen(onClick = {})
         }
 
         composeTestRule.onNodeWithText("Home Screen").assertIsDisplayed()
@@ -31,7 +31,7 @@ class HomeScreenTest {
         var clicked = false
 
         composeTestRule.setContent {
-            HomeScreen(onClick = { clicked = true })
+            SkyPlotScreen(onClick = { clicked = true })
         }
 
         composeTestRule.onNodeWithText("Click").performClick()

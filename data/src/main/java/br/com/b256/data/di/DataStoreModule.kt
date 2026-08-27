@@ -21,7 +21,7 @@ import javax.inject.Singleton
 private const val USER_PREFERENCES = "user_preferences"
 
 /**
- * Provê o `DataStore<Preferences>` singleton usado por [br.com.b256.data.datastore.PreferencesDataSource],
+ * Provê o `DataStore<Preferences>` singleton usado por [PreferencesDataSource],
  * já com migração automática de um eventual `SharedPreferences` legado (`"user_preferences"`) e
  * tratamento de arquivo corrompido (`ReplaceFileCorruptionHandler`).
  */
