@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SatelliteAlt
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,8 +84,15 @@ private fun SkyPlotCanvas(
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val outlineColor = Color.White.copy(alpha = 0.25f)
     val satelliteIconPainter = rememberVectorPainter(Icons.Default.SatelliteAlt)
+
+    // O fundo do plot usa o par inverso do tema (`inverseSurface`/`inverseOnSurface`), que
+    // garante contraste consistente entre os temas claro e escuro — como o "radar" do sky plot
+    // é sempre escuro, no tema claro ele fica invertido em relação ao restante da tela.
+    val backgroundColor = MaterialTheme.colorScheme.inverseSurface
+    val contentColor = MaterialTheme.colorScheme.inverseOnSurface
+    val outlineColor = contentColor.copy(alpha = 0.25f)
+    val unusedSatelliteColor = contentColor.copy(alpha = 0.5f)
 
     // Lógica para suavizar a rotação e lidar com o wrap-around (0/360 graus)
     var smoothedAzimuth by remember { mutableStateOf(azimuth) }
@@ -105,14 +113,21 @@ private fun SkyPlotCanvas(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(color = Color(0xFF102A54))
+            .background(color = backgroundColor)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val center = Offset(size.width / 2, size.height / 2)
             val radius = size.minDimension / 2 - 20.dp.toPx()
 
             rotate(-animatedAzimuth, pivot = center) {
-                drawSkyPlotGrid(center, radius, outlineColor, textMeasurer, animatedAzimuth)
+                drawSkyPlotGrid(
+                    center = center,
+                    radius = radius,
+                    outlineColor = outlineColor,
+                    contentColor = contentColor,
+                    textMeasurer = textMeasurer,
+                    animatedAzimuth = animatedAzimuth,
+                )
 
                 // Desenhar Satélites
                 gnssInfo.satellites.forEach { satellite ->
@@ -122,7 +137,9 @@ private fun SkyPlotCanvas(
                         radius = radius,
                         animatedAzimuth = animatedAzimuth,
                         iconPainter = satelliteIconPainter,
-                        textMeasurer = textMeasurer
+                        textMeasurer = textMeasurer,
+                        unusedSatelliteColor = unusedSatelliteColor,
+                        labelColor = contentColor,
                     )
                 }
             }
@@ -137,6 +154,8 @@ private fun SkyPlotCanvas(
  * @param center O ponto central (x, y) onde o gráfico será desenhado.
  * @param radius O raio máximo do círculo externo (representando 0° de elevação).
  * @param outlineColor A cor utilizada para as linhas e círculos da grade.
+ * @param contentColor A cor utilizada para os rótulos de texto (pontos cardeais e ângulos),
+ * derivada de [MaterialTheme] para contrastar com o fundo do plot.
  * @param textMeasurer Utilitário para medir e desenhar os rótulos de texto.
  * @param animatedAzimuth O valor atual do azimute animado, utilizado para rotacionar
  * os textos individualmente para permanecerem legíveis (verticalmente alinhados)
@@ -146,6 +165,7 @@ private fun DrawScope.drawSkyPlotGrid(
     center: Offset,
     radius: Float,
     outlineColor: Color,
+    contentColor: Color,
     textMeasurer: TextMeasurer,
     animatedAzimuth: Float
 ) {
@@ -188,7 +208,7 @@ private fun DrawScope.drawSkyPlotGrid(
     )
 
     // Desenhar linhas de azimute a cada 30 graus
-    val labelStyle = TextStyle(fontSize = 10.sp, color = Color.White)
+    val labelStyle = TextStyle(fontSize = 10.sp, color = contentColor)
     for (angle in 0 until 360 step 30) {
         val angleRad = Math.toRadians(angle.toDouble() - 90.0)
         val startX = center.x + (radius * 0.1f) * cos(angleRad).toFloat()
@@ -228,7 +248,7 @@ private fun DrawScope.drawSkyPlotGrid(
     // Pontos Cardeais principais
     val cardinalStyle = TextStyle(
         fontSize = 12.sp,
-        color = Color.White,
+        color = contentColor,
         fontWeight = FontWeight.Bold
     )
     drawText(
@@ -271,6 +291,10 @@ private fun DrawScope.drawSkyPlotGrid(
  * @param animatedAzimuth O valor atual da rotação do azimute para compensar a orientação do dispositivo.
  * @param iconPainter O [Painter] responsável por desenhar o ícone do satélite.
  * @param textMeasurer O medidor de texto utilizado para renderizar o ID do satélite.
+ * @param unusedSatelliteColor A cor aplicada ao ícone de satélites que não estão sendo usados
+ * na correção da posição, derivada de [MaterialTheme] para contrastar com o fundo do plot.
+ * @param labelColor A cor utilizada para o rótulo com o SVID do satélite, derivada de
+ * [MaterialTheme] para contrastar com o fundo do plot.
  */
 private fun DrawScope.drawSatellite(
     satellite: GnssSatellite,
@@ -278,7 +302,9 @@ private fun DrawScope.drawSatellite(
     radius: Float,
     animatedAzimuth: Float,
     iconPainter: Painter,
-    textMeasurer: TextMeasurer
+    textMeasurer: TextMeasurer,
+    unusedSatelliteColor: Color,
+    labelColor: Color,
 ) {
     val angleRad = Math.toRadians(satellite.azimuthDegrees.toDouble() - 90.0)
     val r = radius * (1f - satellite.elevationDegrees / 90f)
@@ -287,7 +313,7 @@ private fun DrawScope.drawSatellite(
     val y = center.y + r * sin(angleRad).toFloat()
 
     val satelliteColor = if (!satellite.usedInFix) {
-        Color.LightGray.copy(alpha = 0.5f)
+        unusedSatelliteColor
     } else {
         Color(satellite.constellation.color)
     }
@@ -317,7 +343,7 @@ private fun DrawScope.drawSatellite(
                 textMeasurer,
                 satellite.svid.toString(),
                 Offset(x + iconSize / 2, y - iconSize / 2),
-                style = TextStyle(fontSize = 8.sp, color = Color.White)
+                style = TextStyle(fontSize = 8.sp, color = labelColor)
             )
         }
     }
