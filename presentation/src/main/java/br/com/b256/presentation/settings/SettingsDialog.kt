@@ -114,35 +114,9 @@ private fun ColumnScope.SettingsPanel(
     onChangeDatum: (datum: Datum) -> Unit,
 ) {
     Text(
-        text = stringResource(R.string.presentation_settings_theme),
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-    )
-
-    Column(Modifier.selectableGroup()) {
-        SettingsDialogChooserRow(
-            text = stringResource(R.string.presentation_settings_theme_default),
-            selected = theme == Theme.FOLLOW_SYSTEM,
-            onClick = { onChangeTheme(Theme.FOLLOW_SYSTEM) },
-        )
-        SettingsDialogChooserRow(
-            text = stringResource(R.string.presentation_settings_theme_light),
-            selected = theme == Theme.LIGHT,
-            onClick = { onChangeTheme(Theme.LIGHT) },
-        )
-        SettingsDialogChooserRow(
-            text = stringResource(R.string.presentation_settings_theme_dark),
-            selected = theme == Theme.DARK,
-            onClick = { onChangeTheme(Theme.DARK) },
-        )
-    }
-
-    HorizontalDivider(Modifier.padding(vertical = 8.dp))
-
-    Text(
         text = stringResource(R.string.presentation_settings_datum),
         style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(bottom = 8.dp),
+        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
     )
 
     Column(Modifier.selectableGroup()) {
@@ -188,6 +162,32 @@ private fun ColumnScope.SettingsPanel(
             text = stringResource(R.string.presentation_settings_datum_ed50),
             selected = datum == Datum.ED50,
             onClick = { onChangeDatum(Datum.ED50) },
+        )
+    }
+
+    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+    Text(
+        text = stringResource(R.string.presentation_settings_theme),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+    )
+
+    Column(Modifier.selectableGroup()) {
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_theme_default),
+            selected = theme == Theme.FOLLOW_SYSTEM,
+            onClick = { onChangeTheme(Theme.FOLLOW_SYSTEM) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_theme_light),
+            selected = theme == Theme.LIGHT,
+            onClick = { onChangeTheme(Theme.LIGHT) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_theme_dark),
+            selected = theme == Theme.DARK,
+            onClick = { onChangeTheme(Theme.DARK) },
         )
     }
 }
