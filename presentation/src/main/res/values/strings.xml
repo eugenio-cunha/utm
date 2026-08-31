@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="presentation_skyplot_title">SkyPlot</string>
+    <string name="presentation_skyplot_title">GNSS SkyPlot</string>
     <string name="presentation_skyplot_top_app_bar_action_settings">Settings</string>
     <string name="presentation_settings_title">Settings</string>
     <string name="presentation_settings_loading">Loading\n</string>

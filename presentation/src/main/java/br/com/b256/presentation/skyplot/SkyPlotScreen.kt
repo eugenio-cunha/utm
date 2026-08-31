@@ -289,54 +289,6 @@ private fun MissionStatusBar(gnssState: GnssInfo?, modifier: Modifier = Modifier
             )
         }
     }
-
-//    Row(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .clip(MaterialTheme.shapes.large)
-//            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
-//            .border(
-//                width = BorderHalf,
-//                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-//                shape = MaterialTheme.shapes.large,
-//            )
-//            .padding(horizontal = PaddingDouble, vertical = PaddingSingle),
-//        horizontalArrangement = Arrangement.SpaceBetween,
-//        verticalAlignment = Alignment.CenterVertically,
-//    ) {
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            Box(
-//                modifier = Modifier
-//                    .size(8.dp)
-//                    .clip(CircleShape)
-//                    .background(statusColor.copy(alpha = pulseAlpha)),
-//            )
-//            Spacer(modifier = Modifier.width(PaddingSingle))
-//            Text(
-//                text = stringResource(statusTextRes).uppercase(),
-//                style = MaterialTheme.typography.labelMedium,
-//                fontFamily = FontFamily.Monospace,
-//                fontWeight = FontWeight.Bold,
-//                letterSpacing = 1.sp,
-//                color = MaterialTheme.colorScheme.onSurface,
-//            )
-//        }
-//
-//        Text(
-//            text = if (gnssState != null) {
-//                stringResource(
-//                    R.string.presentation_skyplot_satellites_in_fix,
-//                    gnssState.satellitesUsedInFix,
-//                    gnssState.satellitesVisible,
-//                )
-//            } else {
-//                "--"
-//            },
-//            style = MaterialTheme.typography.labelMedium,
-//            fontFamily = FontFamily.Monospace,
-//            color = MaterialTheme.colorScheme.onSurfaceVariant,
-//        )
-//    }
 }
 
 /**
@@ -887,12 +839,12 @@ private fun Location(
                         }
                         share(context, shareText)
                     },
-                    modifier = Modifier.size(IconDouble),
+                    modifier = Modifier.size(IconTreble),
                 ) {
                     Icon(
                         imageVector = Asset.Share,
                         contentDescription = shareContentDescription,
-                        modifier = Modifier.size(IconSingle),
+                        modifier = Modifier.size(IconDouble),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
