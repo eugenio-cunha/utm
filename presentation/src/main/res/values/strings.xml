@@ -9,4 +9,20 @@
     <string name="presentation_settings_theme_default">Default</string>
     <string name="presentation_settings_theme_light">Light</string>
     <string name="presentation_settings_theme_dark">Dark</string>
+
+    <string name="presentation_skyplot_meters">%1$.2f</string>
+    <string name="presentation_skyplot_altitude">Altitude</string>
+    <string name="presentation_skyplot_accuracy">Accuracy</string>
+    <string name="presentation_skyplot_latitude">Latitude</string>
+    <string name="presentation_skyplot_longitude">Longitude</string>
+    <string name="presentation_skyplot_easting">Easting</string>
+    <string name="presentation_skyplot_northing">Northing</string>
+    <string name="presentation_skyplot_zone">Zone</string>
+    <string name="presentation_skyplot_satellites">Satellites</string>
+    <string name="presentation_skyplot_satellite_id">ID</string>
+    <string name="presentation_skyplot_satellite_signal">Signal</string>
+    <string name="presentation_skyplot_satellite_elevation">Elev.</string>
+    <string name="presentation_skyplot_satellite_azimuth">Azim.</string>
+    <string name="presentation_skyplot_share">Share Location</string>
+    <string name="presentation_skyplot_location_title">Current Position</string>
 </resources>

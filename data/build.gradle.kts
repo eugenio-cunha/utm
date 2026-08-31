@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation(projects.domain)
 
+    implementation(libs.geo.coords)
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)

@@ -9,4 +9,20 @@
     <string name="presentation_settings_theme_default">Padrão do sistema</string>
     <string name="presentation_settings_theme_light">Light</string>
     <string name="presentation_settings_theme_dark">Dark</string>
+
+    <string name="presentation_skyplot_meters">%1$.2f</string>
+    <string name="presentation_skyplot_altitude">Elevação</string>
+    <string name="presentation_skyplot_accuracy">Precisão</string>
+    <string name="presentation_skyplot_latitude">Latitude</string>
+    <string name="presentation_skyplot_longitude">Longitude</string>
+    <string name="presentation_skyplot_easting">Easting</string>
+    <string name="presentation_skyplot_northing">Northing</string>
+    <string name="presentation_skyplot_zone">Zona</string>
+    <string name="presentation_skyplot_satellites">Satélites</string>
+    <string name="presentation_skyplot_satellite_id">ID</string>
+    <string name="presentation_skyplot_satellite_signal">Sinal</string>
+    <string name="presentation_skyplot_satellite_elevation">Elev.</string>
+    <string name="presentation_skyplot_satellite_azimuth">Azim.</string>
+    <string name="presentation_skyplot_share">Compartilhar Localização</string>
+    <string name="presentation_skyplot_location_title">Posição Atual</string>
 </resources>
