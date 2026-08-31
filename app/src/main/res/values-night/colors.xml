@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background_tint">#FCFCFC</color>
-    <color name="ic_launcher_foreground_tint">#000000</color>
+    <!-- Ícone do launcher — paleta do tema escuro (ver designsystem/theme/Color.kt). -->
+    <color name="ic_launcher_background_tint">#1B1C1E</color>
+    <color name="ic_launcher_foreground_tint">#ECC38C</color>
+    <color name="ic_launcher_accent_tint">#B9C6DE</color>
 </resources>
