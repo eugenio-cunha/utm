@@ -20,9 +20,15 @@
     <string name="presentation_skyplot_zone">Zona</string>
     <string name="presentation_skyplot_satellites">Satélites</string>
     <string name="presentation_skyplot_satellite_id">ID</string>
+    <string name="presentation_skyplot_satellite_constellation">Const.</string>
     <string name="presentation_skyplot_satellite_signal">Sinal</string>
     <string name="presentation_skyplot_satellite_elevation">Elev.</string>
     <string name="presentation_skyplot_satellite_azimuth">Azim.</string>
     <string name="presentation_skyplot_share">Compartilhar Localização</string>
     <string name="presentation_skyplot_location_title">Posição Atual</string>
+    <string name="presentation_skyplot_panel_skyview">Vista do Céu</string>
+    <string name="presentation_skyplot_satellites_in_fix">%1$d / %2$d NO FIX</string>
+    <string name="presentation_skyplot_status_fix_acquired">Fix Adquirido</string>
+    <string name="presentation_skyplot_status_acquiring">Adquirindo Sinal</string>
+    <string name="presentation_skyplot_status_no_signal">Sem Sinal</string>
 </resources>

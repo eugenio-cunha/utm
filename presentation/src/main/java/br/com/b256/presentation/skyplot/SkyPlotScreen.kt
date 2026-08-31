@@ -9,10 +9,14 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,12 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,15 +42,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.b256.domain.entities.GnssInfo
@@ -60,9 +65,14 @@ import br.com.b256.domain.entities.GpsLocation
 import br.com.b256.domain.entities.Orientation
 import br.com.b256.presentation.R
 import br.com.b256.presentation.designsystem.asset.Asset
-import br.com.b256.presentation.designsystem.component.B256TopAppBar
+import br.com.b256.presentation.designsystem.theme.BorderHalf
+import br.com.b256.presentation.designsystem.theme.IconDouble
+import br.com.b256.presentation.designsystem.theme.IconSingle
+import br.com.b256.presentation.designsystem.theme.IconTreble
 import br.com.b256.presentation.designsystem.theme.PaddingDouble
+import br.com.b256.presentation.designsystem.theme.PaddingHalf
 import br.com.b256.presentation.designsystem.theme.PaddingSingle
+import br.com.b256.presentation.designsystem.theme.PaddingTreble
 import br.com.b256.presentation.settings.SettingsDialog
 import br.com.b256.presentation.skyplot.components.GnssSkyPlot
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -100,9 +110,14 @@ internal fun SkyPlotScreen(
  * `internal` (em vez de `private`) para ficar visível a partir de `HomeScreenTest`, no
  * `androidTest` deste módulo.
  *
+ * O layout é inspirado em painéis de controle de missão: um cabeçalho compacto ([MissionHeader])
+ * com o título e o acesso às configurações, uma barra de status de telemetria ([MissionStatusBar])
+ * e painéis técnicos ([MissionPanel]) para posição, sky plot e satélites, cada um com bordas
+ * finas, marcas de canto e tipografia monoespaçada.
+ *
  * A tela não declara um `Scaffold` próprio — o `Scaffold` da aplicação vive em
- * [B256App]. Como nem toda tela usa a mesma topbar, cada feature posiciona a
- * sua ([B256TopAppBar]) no topo do próprio conteúdo.
+ * [B256App]. Diferente das demais features, esta não usa a topbar padrão do design system
+ * (`B256TopAppBar`): o cabeçalho é o próprio [MissionHeader], para manter a estética de console.
  */
 @Composable
 internal fun SkyPlotScreen(
@@ -119,21 +134,19 @@ internal fun SkyPlotScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        B256TopAppBar(
-            titleRes = R.string.presentation_skyplot_title,
-            actionIcon = Asset.Settings,
-            actionIconContentDescription = stringResource(
-                R.string.presentation_skyplot_top_app_bar_action_settings,
-            ),
-            onActionClick = { showSettingsDialog = true },
-        )
+        MissionHeader(onSettingsClick = { showSettingsDialog = true })
 
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(PaddingSingle),
-            verticalArrangement = Arrangement.spacedBy(PaddingSingle),
+                .padding(horizontal = PaddingDouble),
+            contentPadding = PaddingValues(vertical = PaddingDouble),
+            verticalArrangement = Arrangement.spacedBy(PaddingTreble),
         ) {
+            item(key = "status") {
+                MissionStatusBar(gnssState = gnssState)
+            }
+
             item(key = "location") {
                 if (locationState != null) {
                     Location(
@@ -156,20 +169,181 @@ internal fun SkyPlotScreen(
             }
 
             gnssState?.let {
-                satelliteItems(it, locale = locale)
+                item(key = "satellites") {
+                    SatellitePanel(
+                        gnssInfo = it,
+                        locale = locale,
+                    )
+                }
             }
         }
     }
 }
 
 /**
- * Placeholder animado (efeito "shimmer") exibido no lugar do card [Location] enquanto a
- * localização ainda não foi obtida.
+ * Cabeçalho compacto da tela, no lugar da topbar padrão do design system ([B256TopAppBar]):
+ * exibe o título em caixa alta e fonte monoespaçada à esquerda e o botão de acesso às
+ * configurações ([SettingsDialog]) à direita, mantendo a estética de console de controle de
+ * missão do restante da tela.
  *
- * @param modifier [Modifier] aplicado ao [Card] raiz.
+ * @param onSettingsClick Callback disparado ao tocar no botão de configurações.
+ * @param modifier [Modifier] aplicado à [Row] raiz.
  */
 @Composable
-private fun LocationSkeleton(modifier: Modifier = Modifier) {
+private fun MissionHeader(onSettingsClick: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = PaddingDouble, vertical = PaddingSingle),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.presentation_skyplot_title).uppercase(),
+            style = MaterialTheme.typography.titleLarge,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 4.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        IconButton(
+            onClick = onSettingsClick,
+            modifier = Modifier.size(IconTreble),
+        ) {
+            Icon(
+                imageVector = Asset.Settings,
+                contentDescription = stringResource(
+                    R.string.presentation_skyplot_top_app_bar_action_settings,
+                ),
+                modifier = Modifier.size(IconDouble),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+/**
+ * Faixa de telemetria exibida no topo da lista, resumindo o status geral do GNSS: um indicador
+ * pulsante (cinza sem dados, laranja adquirindo sinal, verde com fix) seguido do rótulo textual
+ * correspondente, e a contagem de satélites usados no fix em relação ao total visível.
+ *
+ * @param gnssState Estado atual do GNSS, ou `null` enquanto nenhum dado foi recebido ainda.
+ * @param modifier [Modifier] aplicado à [Row] raiz.
+ */
+@Composable
+private fun MissionStatusBar(gnssState: GnssInfo?, modifier: Modifier = Modifier) {
+    val hasFix = (gnssState?.satellitesUsedInFix ?: 0) > 0
+
+    val statusColor = when {
+        gnssState == null -> MaterialTheme.colorScheme.outline
+        hasFix -> Color(0xFF4CAF50)
+        else -> MaterialTheme.colorScheme.primary
+    }
+    val statusTextRes = when {
+        gnssState == null -> R.string.presentation_skyplot_status_no_signal
+        hasFix -> R.string.presentation_skyplot_status_fix_acquired
+        else -> R.string.presentation_skyplot_status_acquiring
+    }
+    val pulseAlpha = shimmerAlpha()
+
+    MissionPanelSurface {
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(statusColor.copy(alpha = pulseAlpha)),
+                )
+                Spacer(modifier = Modifier.width(PaddingSingle))
+                Text(
+                    text = stringResource(statusTextRes).uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Text(
+                text = if (gnssState != null) {
+                    stringResource(
+                        R.string.presentation_skyplot_satellites_in_fix,
+                        gnssState.satellitesUsedInFix,
+                        gnssState.satellitesVisible,
+                    )
+                } else {
+                    "--"
+                },
+                style = MaterialTheme.typography.labelMedium,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+
+//    Row(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .clip(MaterialTheme.shapes.large)
+//            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+//            .border(
+//                width = BorderHalf,
+//                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+//                shape = MaterialTheme.shapes.large,
+//            )
+//            .padding(horizontal = PaddingDouble, vertical = PaddingSingle),
+//        horizontalArrangement = Arrangement.SpaceBetween,
+//        verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//            Box(
+//                modifier = Modifier
+//                    .size(8.dp)
+//                    .clip(CircleShape)
+//                    .background(statusColor.copy(alpha = pulseAlpha)),
+//            )
+//            Spacer(modifier = Modifier.width(PaddingSingle))
+//            Text(
+//                text = stringResource(statusTextRes).uppercase(),
+//                style = MaterialTheme.typography.labelMedium,
+//                fontFamily = FontFamily.Monospace,
+//                fontWeight = FontWeight.Bold,
+//                letterSpacing = 1.sp,
+//                color = MaterialTheme.colorScheme.onSurface,
+//            )
+//        }
+//
+//        Text(
+//            text = if (gnssState != null) {
+//                stringResource(
+//                    R.string.presentation_skyplot_satellites_in_fix,
+//                    gnssState.satellitesUsedInFix,
+//                    gnssState.satellitesVisible,
+//                )
+//            } else {
+//                "--"
+//            },
+//            style = MaterialTheme.typography.labelMedium,
+//            fontFamily = FontFamily.Monospace,
+//            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//        )
+//    }
+}
+
+/**
+ * Valor de opacidade que oscila continuamente entre 0.3 e 0.7, usado tanto para o efeito
+ * "shimmer" dos skeletons quanto para o pulsar do indicador em [MissionStatusBar].
+ */
+@Composable
+private fun shimmerAlpha(): Float {
     val transition = rememberInfiniteTransition(label = "shimmer")
     val alpha by transition.animateFloat(
         initialValue = 0.3f,
@@ -180,50 +354,51 @@ private fun LocationSkeleton(modifier: Modifier = Modifier) {
         ),
         label = "alpha"
     )
+    return alpha
+}
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(PaddingSingle),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        ),
+/**
+ * Placeholder animado (efeito "shimmer") exibido no lugar do painel [Location] enquanto a
+ * localização ainda não foi obtida. O título do painel já é exibido normalmente; apenas os
+ * valores, ainda desconhecidos, pulsam como blocos cinza.
+ *
+ * @param modifier [Modifier] aplicado ao [MissionPanel] raiz.
+ */
+@Composable
+private fun LocationSkeleton(modifier: Modifier = Modifier) {
+    val alpha = shimmerAlpha()
+
+    MissionPanel(
+        title = stringResource(R.string.presentation_skyplot_location_title),
+        modifier = modifier,
     ) {
-        Column(
-            modifier = Modifier.padding(PaddingDouble),
-            verticalArrangement = Arrangement.spacedBy(PaddingDouble),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
         ) {
-            // Geographic Coordinates Skeleton
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
-            ) {
-                SkeletonItem(Modifier.weight(1f), alpha)
-                SkeletonItem(Modifier.weight(1f), alpha)
-            }
+            SkeletonItem(Modifier.weight(1f), alpha)
+            SkeletonItem(Modifier.weight(1f), alpha)
+        }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        MissionDivider()
 
-            // UTM Coordinates Skeleton
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
-            ) {
-                SkeletonItem(Modifier.weight(0.5f), alpha)
-                SkeletonItem(Modifier.weight(1f), alpha)
-                SkeletonItem(Modifier.weight(1f), alpha)
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+        ) {
+            SkeletonItem(Modifier.weight(0.5f), alpha)
+            SkeletonItem(Modifier.weight(1f), alpha)
+            SkeletonItem(Modifier.weight(1f), alpha)
+        }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        MissionDivider()
 
-            // Altitude and Accuracy Skeleton
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
-            ) {
-                SkeletonItem(Modifier.weight(1f), alpha)
-                SkeletonItem(Modifier.weight(1f), alpha)
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+        ) {
+            SkeletonItem(Modifier.weight(1f), alpha)
+            SkeletonItem(Modifier.weight(1f), alpha)
         }
     }
 }
@@ -257,37 +432,24 @@ private fun SkeletonItem(modifier: Modifier = Modifier, alpha: Float) {
 }
 
 /**
- * Placeholder animado (efeito "shimmer") exibido no lugar do card [SkyPlot] enquanto os dados
- * de GNSS e orientação ainda não estão disponíveis.
+ * Placeholder animado (efeito "shimmer") exibido no lugar do painel [SkyPlot] enquanto os dados
+ * de GNSS e orientação ainda não estão disponíveis: círculos concêntricos pulsantes no lugar da
+ * grade de satélites.
  *
- * @param modifier [Modifier] aplicado ao [Card] raiz.
+ * @param modifier [Modifier] aplicado ao [MissionPanel] raiz.
  */
 @Composable
 private fun SkyPlotSkeleton(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val alpha by transition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.7f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "alpha"
-    )
+    val alpha = shimmerAlpha()
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(PaddingSingle),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        ),
+    MissionPanel(
+        title = stringResource(R.string.presentation_skyplot_panel_skyview),
+        modifier = modifier,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .padding(PaddingDouble),
+                .aspectRatio(1f),
             contentAlignment = Alignment.Center
         ) {
             // Large circular shimmer representing the SkyPlot grid
@@ -315,10 +477,140 @@ private fun SkyPlotSkeleton(modifier: Modifier = Modifier) {
 }
 
 /**
- * Card que envolve o [GnssSkyPlot], exibindo a posição dos satélites GNSS em relação à
- * orientação atual do dispositivo.
+ * Painel técnico reutilizado por todas as seções da tela, no estilo de um instrumento de painel
+ * de controle de missão: um cabeçalho com um marcador quadrado, o [title] em caixa alta e fonte
+ * monoespaçada, e um espaço opcional para conteúdo à direita ([trailing]); abaixo, uma superfície
+ * com borda fina e marcas de canto ([MissionPanelSurface]) envolvendo o [content].
  *
- * @param modifier [Modifier] aplicado tanto ao [Card] quanto ao [GnssSkyPlot] interno.
+ * @param title Título do painel, exibido em caixa alta no cabeçalho.
+ * @param modifier [Modifier] aplicado à [Column] raiz.
+ * @param trailing Conteúdo opcional exibido à direita do cabeçalho (ex.: contadores, ações).
+ * @param content Conteúdo do painel, disposto verticalmente dentro de [MissionPanelSurface].
+ */
+@Composable
+private fun MissionPanel(
+    title: String,
+    modifier: Modifier = Modifier,
+    trailing: @Composable () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = PaddingHalf, vertical = PaddingHalf),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                )
+                Spacer(modifier = Modifier.width(PaddingSingle))
+                Text(
+                    text = title.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            trailing()
+        }
+
+        Spacer(modifier = Modifier.height(PaddingSingle))
+
+        MissionPanelSurface(content = content)
+    }
+}
+
+/**
+ * Superfície com borda fina, cantos arredondados e marcas de canto em "L" (ver
+ * [drawMissionCorners]) que dá aos painéis da tela a aparência de um instrumento de HUD/console
+ * de controle de missão. Usada internamente por [MissionPanel].
+ *
+ * @param modifier [Modifier] aplicado ao [Box] raiz.
+ * @param content Conteúdo disposto verticalmente dentro da superfície.
+ */
+@Composable
+private fun MissionPanelSurface(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val cornerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(PaddingDouble),
+            verticalArrangement = Arrangement.spacedBy(PaddingDouble),
+            content = content,
+        )
+
+        Canvas(modifier = Modifier.matchParentSize()) {
+            drawMissionCorners(color = cornerColor)
+        }
+    }
+}
+
+/**
+ * Desenha marcas de canto em "L" nos quatro cantos da área disponível, evocando as marcas de
+ * mira de um HUD ou de um instrumento de painel de controle de missão.
+ *
+ * @param color Cor das marcas de canto.
+ * @param length Comprimento de cada segmento da marca.
+ * @param inset Distância entre a marca e a borda da área disponível.
+ * @param strokeWidth Espessura do traço.
+ */
+private fun DrawScope.drawMissionCorners(
+    color: Color,
+    length: Dp = 12.dp,
+    inset: Dp = 1.dp,
+    strokeWidth: Dp = 2.dp,
+) {
+    val lengthPx = length.toPx()
+    val insetPx = inset.toPx()
+    val strokePx = strokeWidth.toPx()
+    val right = size.width - insetPx
+    val bottom = size.height - insetPx
+
+    // Superior esquerdo
+    drawLine(color, Offset(insetPx, insetPx), Offset(insetPx + lengthPx, insetPx), strokePx, StrokeCap.Round)
+    drawLine(color, Offset(insetPx, insetPx), Offset(insetPx, insetPx + lengthPx), strokePx, StrokeCap.Round)
+    // Superior direito
+    drawLine(color, Offset(right, insetPx), Offset(right - lengthPx, insetPx), strokePx, StrokeCap.Round)
+    drawLine(color, Offset(right, insetPx), Offset(right, insetPx + lengthPx), strokePx, StrokeCap.Round)
+    // Inferior esquerdo
+    drawLine(color, Offset(insetPx, bottom), Offset(insetPx + lengthPx, bottom), strokePx, StrokeCap.Round)
+    drawLine(color, Offset(insetPx, bottom), Offset(insetPx, bottom - lengthPx), strokePx, StrokeCap.Round)
+    // Inferior direito
+    drawLine(color, Offset(right, bottom), Offset(right - lengthPx, bottom), strokePx, StrokeCap.Round)
+    drawLine(color, Offset(right, bottom), Offset(right, bottom - lengthPx), strokePx, StrokeCap.Round)
+}
+
+/**
+ * Linha divisória fina usada dentro dos painéis técnicos ([MissionPanel]) para separar seções
+ * de dados, mantendo o mesmo tom discreto da borda dos painéis.
+ */
+@Composable
+private fun MissionDivider() {
+    HorizontalDivider(
+        thickness = BorderHalf,
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+    )
+}
+
+/**
+ * Painel com o [GnssSkyPlot], exibindo a posição dos satélites GNSS em relação à orientação
+ * atual do dispositivo, com a contagem de satélites usados no fix ao lado do título.
+ *
+ * @param modifier [Modifier] aplicado ao [MissionPanel] raiz.
  * @param gnssState Estado atual do GNSS, com a lista de satélites a serem plotados.
  * @param orientationState Orientação atual do dispositivo, usada para alinhar o plot.
  */
@@ -328,108 +620,134 @@ private fun SkyPlot(
     gnssState: GnssInfo,
     orientationState: Orientation,
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(PaddingSingle),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        ),
+    MissionPanel(
+        title = stringResource(R.string.presentation_skyplot_panel_skyview),
+        modifier = modifier,
+        trailing = {
+            Text(
+                text = stringResource(
+                    R.string.presentation_skyplot_satellites_in_fix,
+                    gnssState.satellitesUsedInFix,
+                    gnssState.satellitesVisible,
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
     ) {
         GnssSkyPlot(
-            modifier = modifier,
             gnssInfo = gnssState,
             orientation = orientationState,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 /**
- * Adiciona à [LazyListScope] o cabeçalho da tabela de satélites ([SatelliteHeader]) seguido de
- * uma linha ([SatelliteRow]) para cada satélite em [gnssInfo].
+ * Painel com a tabela de satélites: um cabeçalho de colunas ([SatelliteTableHeader]) seguido de
+ * uma linha ([SatelliteRow]) para cada satélite em [gnssInfo], separadas por divisórias finas.
  *
  * @param gnssInfo Estado atual do GNSS, com a lista de satélites a serem listados.
  * @param locale [Locale] usado para formatar os valores numéricos de cada satélite.
+ * @param modifier [Modifier] aplicado ao [MissionPanel] raiz.
  */
-private fun LazyListScope.satelliteItems(
+@Composable
+private fun SatellitePanel(
     gnssInfo: GnssInfo,
     locale: Locale,
+    modifier: Modifier = Modifier,
 ) {
-    item("satellite_header") {
-        SatelliteHeader()
-    }
-
-    items(
-        items = gnssInfo.satellites,
-        key = { "${it.constellation}_${it.svid}" },
+    MissionPanel(
+        title = stringResource(R.string.presentation_skyplot_satellites),
+        modifier = modifier,
+        trailing = {
+            Text(
+                text = stringResource(
+                    R.string.presentation_skyplot_satellites_in_fix,
+                    gnssInfo.satellitesUsedInFix,
+                    gnssInfo.satellitesVisible,
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
     ) {
-        SatelliteRow(
-            satellite = it,
-            locale = locale,
-        )
+        SatelliteTableHeader()
+
+        gnssInfo.satellites.forEachIndexed { index, satellite ->
+            SatelliteRow(
+                satellite = satellite,
+                locale = locale,
+            )
+            if (index != gnssInfo.satellites.lastIndex) {
+                MissionDivider()
+            }
+        }
     }
 }
 
 /**
- * Cabeçalho da tabela de satélites: exibe o título da seção e os rótulos de cada coluna
- * (ID, constelação, sinal, elevação e azimute).
+ * Cabeçalho da tabela de satélites: exibe os rótulos de cada coluna (ID, constelação, sinal,
+ * elevação e azimute), seguidos de uma divisória.
  */
 @Composable
-private fun SatelliteHeader() {
-    Column(modifier = Modifier.padding(PaddingSingle)) {
+private fun SatelliteTableHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = PaddingHalf),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
-            text = stringResource(R.string.presentation_skyplot_satellites).uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = PaddingSingle),
+            text = stringResource(R.string.presentation_skyplot_satellite_id),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(40.dp),
         )
-
-        // Table Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(R.string.presentation_skyplot_satellite_id),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.width(40.dp),
-            )
-            Text(
-                text = "CONST.",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.weight(1f),
-            )
-            Text(
-                text = stringResource(R.string.presentation_skyplot_satellite_signal),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.width(60.dp),
-                textAlign = TextAlign.End,
-            )
-            Text(
-                text = stringResource(R.string.presentation_skyplot_satellite_elevation),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.width(50.dp),
-                textAlign = TextAlign.End,
-            )
-            Text(
-                text = stringResource(R.string.presentation_skyplot_satellite_azimuth),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.width(50.dp),
-                textAlign = TextAlign.End,
-            )
-        }
-
-        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+        Text(
+            text = stringResource(R.string.presentation_skyplot_satellite_constellation),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = stringResource(R.string.presentation_skyplot_satellite_signal),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(60.dp),
+            textAlign = TextAlign.End,
+        )
+        Text(
+            text = stringResource(R.string.presentation_skyplot_satellite_elevation),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(50.dp),
+            textAlign = TextAlign.End,
+        )
+        Text(
+            text = stringResource(R.string.presentation_skyplot_satellite_azimuth),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(50.dp),
+            textAlign = TextAlign.End,
+        )
     }
+
+    MissionDivider()
 }
 
 /**
  * Linha da tabela de satélites com os dados de um único [GnssSatellite]: ID, constelação
- * (com indicador de cor), força de sinal (CN0), elevação e azimute. O ID é exibido em negrito
- * quando o satélite está sendo usado no cálculo da posição (`usedInFix`).
+ * (com indicador de cor), força de sinal (CN0), elevação e azimute, todos em fonte monoespaçada.
+ * O ID é exibido em negrito e na cor de destaque quando o satélite está sendo usado no cálculo
+ * da posição (`usedInFix`).
  *
  * @param satellite Satélite cujos dados serão exibidos na linha.
  * @param locale [Locale] usado para formatar os valores numéricos.
@@ -442,13 +760,19 @@ private fun SatelliteRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(PaddingSingle),
+            .padding(vertical = PaddingSingle),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = satellite.svid.toString(),
             style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
             fontWeight = if (satellite.usedInFix) FontWeight.Bold else FontWeight.Normal,
+            color = if (satellite.usedInFix) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
             modifier = Modifier.width(40.dp),
         )
 
@@ -466,6 +790,8 @@ private fun SatelliteRow(
             Text(
                 text = satellite.constellation.name,
                 style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -474,18 +800,24 @@ private fun SatelliteRow(
         Text(
             text = String.format(locale, "%.1f", satellite.cn0DbHz),
             style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.width(60.dp),
             textAlign = TextAlign.End,
         )
         Text(
             text = String.format(locale, "%.0f°", satellite.elevationDegrees),
             style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.width(50.dp),
             textAlign = TextAlign.End,
         )
         Text(
             text = String.format(locale, "%.0f°", satellite.azimuthDegrees),
             style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.width(50.dp),
             textAlign = TextAlign.End,
         )
@@ -493,14 +825,14 @@ private fun SatelliteRow(
 }
 
 /**
- * Card com os detalhes da localização atual: coordenadas geográficas (latitude/longitude),
+ * Painel com os detalhes da localização atual: coordenadas geográficas (latitude/longitude),
  * coordenadas UTM (zona, easting, northing), altitude e precisão. Também expõe um botão para
  * compartilhar esses dados como texto via [share].
  *
  * Não renderiza nada caso [locationState] seja `null`.
  *
- * @param modifier [Modifier] aplicado ao [Card] raiz.
- * @param locationState Localização atual a ser exibida, ou `null` para não renderizar o card.
+ * @param modifier [Modifier] aplicado ao [MissionPanel] raiz.
+ * @param locationState Localização atual a ser exibida, ou `null` para não renderizar o painel.
  */
 @Composable
 private fun Location(
@@ -512,142 +844,121 @@ private fun Location(
     val locale = LocalConfiguration.current.locales[0]
     val context = LocalContext.current
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(PaddingSingle),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(PaddingDouble),
-            verticalArrangement = Arrangement.spacedBy(PaddingDouble),
-        ) {
-            // Header with Title and Share Button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.presentation_skyplot_location_title).uppercase(),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                val shareTitle = stringResource(R.string.presentation_skyplot_location_title)
-                val latLabel = stringResource(R.string.presentation_skyplot_latitude)
-                val lonLabel = stringResource(R.string.presentation_skyplot_longitude)
-                val zoneLabel = stringResource(R.string.presentation_skyplot_zone)
-                val eastingLabel = stringResource(R.string.presentation_skyplot_easting)
-                val northingLabel = stringResource(R.string.presentation_skyplot_northing)
-                val altitudeLabel = stringResource(R.string.presentation_skyplot_altitude)
-                val accuracyLabel = stringResource(R.string.presentation_skyplot_accuracy)
+    val shareTitle = stringResource(R.string.presentation_skyplot_location_title)
+    val latLabel = stringResource(R.string.presentation_skyplot_latitude)
+    val lonLabel = stringResource(R.string.presentation_skyplot_longitude)
+    val zoneLabel = stringResource(R.string.presentation_skyplot_zone)
+    val eastingLabel = stringResource(R.string.presentation_skyplot_easting)
+    val northingLabel = stringResource(R.string.presentation_skyplot_northing)
+    val altitudeLabel = stringResource(R.string.presentation_skyplot_altitude)
+    val accuracyLabel = stringResource(R.string.presentation_skyplot_accuracy)
+    val shareContentDescription = stringResource(R.string.presentation_skyplot_share)
 
-                IconButton(
-                    onClick = {
-                        val shareText = buildString {
-                            appendLine("$shareTitle:")
-                            appendLine("$latLabel: ${String.format(locale, "%.6f", locationState.latitude)}°")
-                            appendLine("$lonLabel: ${String.format(locale, "%.6f", locationState.longitude)}°")
-                            appendLine("$zoneLabel: ${locationState.utm.zone}")
-                            appendLine("$eastingLabel: ${locationState.utm.easting}")
-                            appendLine("$northingLabel: ${locationState.utm.northing}")
-                            locationState.altitude?.let {
-                                appendLine("$altitudeLabel: ${String.format(locale, "%.2f", it)}m")
-                            }
-                            locationState.accuracy?.let {
-                                appendLine("$accuracyLabel: ±${String.format(locale, "%.1f", it)}m")
-                            }
+    MissionPanel(
+        title = shareTitle,
+        modifier = modifier,
+        trailing = {
+            IconButton(
+                onClick = {
+                    val shareText = buildString {
+                        appendLine("$shareTitle:")
+                        appendLine("$latLabel: ${String.format(locale, "%.6f", locationState.latitude)}°")
+                        appendLine("$lonLabel: ${String.format(locale, "%.6f", locationState.longitude)}°")
+                        appendLine("$zoneLabel: ${locationState.utm.zone}")
+                        appendLine("$eastingLabel: ${locationState.utm.easting}")
+                        appendLine("$northingLabel: ${locationState.utm.northing}")
+                        locationState.altitude?.let {
+                            appendLine("$altitudeLabel: ${String.format(locale, "%.2f", it)}m")
                         }
-                        share(context, shareText)
-                    },
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Asset.Share,
-                        contentDescription = stringResource(R.string.presentation_skyplot_share),
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-            // Geographic Coordinates
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+                        locationState.accuracy?.let {
+                            appendLine("$accuracyLabel: ±${String.format(locale, "%.1f", it)}m")
+                        }
+                    }
+                    share(context, shareText)
+                },
+                modifier = Modifier.size(IconDouble),
             ) {
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_latitude),
-                    value = String.format(locale, "%.6f", locationState.latitude),
-                    modifier = Modifier.weight(1f),
-                )
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_longitude),
-                    value = String.format(locale, "%.6f", locationState.longitude),
-                    modifier = Modifier.weight(1f),
+                Icon(
+                    imageVector = Asset.Share,
+                    contentDescription = shareContentDescription,
+                    modifier = Modifier.size(IconSingle),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
+        },
+    ) {
+        // Geographic Coordinates
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+        ) {
+            LocationInfoItem(
+                label = latLabel,
+                value = String.format(locale, "%.6f", locationState.latitude),
+                modifier = Modifier.weight(1f),
+            )
+            LocationInfoItem(
+                label = lonLabel,
+                value = String.format(locale, "%.6f", locationState.longitude),
+                modifier = Modifier.weight(1f),
+            )
+        }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        MissionDivider()
 
-            // UTM Coordinates
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
-            ) {
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_zone),
-                    value = locationState.utm.zone,
-                    modifier = Modifier.weight(0.5f),
-                )
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_easting),
-                    value = locationState.utm.easting,
-                    modifier = Modifier.weight(1f),
-                )
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_northing),
-                    value = locationState.utm.northing,
-                    modifier = Modifier.weight(1f),
-                )
-            }
+        // UTM Coordinates
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+        ) {
+            LocationInfoItem(
+                label = zoneLabel,
+                value = locationState.utm.zone,
+                modifier = Modifier.weight(0.5f),
+            )
+            LocationInfoItem(
+                label = eastingLabel,
+                value = locationState.utm.easting,
+                modifier = Modifier.weight(1f),
+            )
+            LocationInfoItem(
+                label = northingLabel,
+                value = locationState.utm.northing,
+                modifier = Modifier.weight(1f),
+            )
+        }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        MissionDivider()
 
-            // Altitude and Accuracy
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
-            ) {
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_altitude),
-                    value = stringResource(
-                        R.string.presentation_skyplot_meters,
-                        locationState.altitude ?: 0.0,
-                    ),
-                    modifier = Modifier.weight(1f),
-                )
-                LocationInfoItem(
-                    label = stringResource(R.string.presentation_skyplot_accuracy),
-                    value = stringResource(
-                        R.string.presentation_skyplot_meters,
-                        locationState.accuracy ?: 0.0,
-                    ),
-                    modifier = Modifier.weight(1f),
-                )
-            }
+        // Altitude and Accuracy
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(PaddingDouble),
+        ) {
+            LocationInfoItem(
+                label = altitudeLabel,
+                value = stringResource(
+                    R.string.presentation_skyplot_meters,
+                    locationState.altitude ?: 0.0,
+                ),
+                modifier = Modifier.weight(1f),
+            )
+            LocationInfoItem(
+                label = accuracyLabel,
+                value = stringResource(
+                    R.string.presentation_skyplot_meters,
+                    locationState.accuracy ?: 0.0,
+                ),
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
 
 /**
- * Par rótulo/valor usado dentro do card [Location] para exibir um único dado da localização
- * (por exemplo, latitude, zona UTM ou altitude).
+ * Par rótulo/valor usado dentro do painel [Location] para exibir um único dado da localização
+ * (por exemplo, latitude, zona UTM ou altitude). O valor é exibido em fonte monoespaçada,
+ * reforçando a leitura como um dado de telemetria.
  *
  * @param label Rótulo do campo, exibido em caixa alta acima do valor.
  * @param value Valor já formatado a ser exibido.
@@ -663,13 +974,16 @@ private fun LocationInfoItem(
         Text(
             text = label.uppercase(),
             style = MaterialTheme.typography.labelSmall,
+            fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
             color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = value,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontFamily = FontFamily.Monospace,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
