@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SatelliteAlt
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import br.com.b256.domain.entities.GnssInfo
 import br.com.b256.domain.entities.GnssSatellite
 import br.com.b256.domain.entities.Orientation
+import br.com.b256.presentation.designsystem.theme.SkyPlotOnSurface
+import br.com.b256.presentation.designsystem.theme.SkyPlotSurface
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -86,11 +87,13 @@ private fun SkyPlotCanvas(
     val textMeasurer = rememberTextMeasurer()
     val satelliteIconPainter = rememberVectorPainter(Icons.Default.SatelliteAlt)
 
-    // O fundo do plot usa o par inverso do tema (`inverseSurface`/`inverseOnSurface`), que
-    // garante contraste consistente entre os temas claro e escuro — como o "radar" do sky plot
-    // é sempre escuro, no tema claro ele fica invertido em relação ao restante da tela.
-    val backgroundColor = MaterialTheme.colorScheme.inverseSurface
-    val contentColor = MaterialTheme.colorScheme.inverseOnSurface
+    // O fundo do plot usa cores fixas (SkyPlotSurface/SkyPlotOnSurface), independentes do tema
+    // claro/escuro: o radar é um instrumento com aparência própria (tela de céu noturno), não uma
+    // superfície do Material. Usar o par inverso (`inverseSurface`/`inverseOnSurface`) fazia o
+    // radar virar um círculo quase branco no tema escuro — o inverso de um tema já escuro —,
+    // prejudicando o contraste dos ícones de satélite com cores mais claras (ex.: amarelo, ciano).
+    val backgroundColor = SkyPlotSurface
+    val contentColor = SkyPlotOnSurface
     val outlineColor = contentColor.copy(alpha = 0.25f)
     val unusedSatelliteColor = contentColor.copy(alpha = 0.5f)
 
@@ -155,7 +158,7 @@ private fun SkyPlotCanvas(
  * @param radius O raio máximo do círculo externo (representando 0° de elevação).
  * @param outlineColor A cor utilizada para as linhas e círculos da grade.
  * @param contentColor A cor utilizada para os rótulos de texto (pontos cardeais e ângulos),
- * derivada de [MaterialTheme] para contrastar com o fundo do plot.
+ * fixa (ver [SkyPlotOnSurface]) para contrastar com o fundo escuro do plot.
  * @param textMeasurer Utilitário para medir e desenhar os rótulos de texto.
  * @param animatedAzimuth O valor atual do azimute animado, utilizado para rotacionar
  * os textos individualmente para permanecerem legíveis (verticalmente alinhados)
@@ -292,9 +295,9 @@ private fun DrawScope.drawSkyPlotGrid(
  * @param iconPainter O [Painter] responsável por desenhar o ícone do satélite.
  * @param textMeasurer O medidor de texto utilizado para renderizar o ID do satélite.
  * @param unusedSatelliteColor A cor aplicada ao ícone de satélites que não estão sendo usados
- * na correção da posição, derivada de [MaterialTheme] para contrastar com o fundo do plot.
- * @param labelColor A cor utilizada para o rótulo com o SVID do satélite, derivada de
- * [MaterialTheme] para contrastar com o fundo do plot.
+ * na correção da posição, fixa (ver [SkyPlotOnSurface]) para contrastar com o fundo do plot.
+ * @param labelColor A cor utilizada para o rótulo com o SVID do satélite, fixa (ver
+ * [SkyPlotOnSurface]) para contrastar com o fundo do plot.
  */
 private fun DrawScope.drawSatellite(
     satellite: GnssSatellite,

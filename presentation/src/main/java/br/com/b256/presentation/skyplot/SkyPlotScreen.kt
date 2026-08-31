@@ -596,13 +596,15 @@ private fun DrawScope.drawMissionCorners(
 
 /**
  * Linha divisória fina usada dentro dos painéis técnicos ([MissionPanel]) para separar seções
- * de dados, mantendo o mesmo tom discreto da borda dos painéis.
+ * de dados. Usa `outlineVariant` em opacidade total — os painéis já têm um fundo translúcido
+ * (ver [MissionPanelSurface]), então diluir ainda mais a cor da divisória (como em uma versão
+ * anterior, com alpha 0.4) a deixava praticamente invisível no tema escuro.
  */
 @Composable
 private fun MissionDivider() {
     HorizontalDivider(
         thickness = BorderHalf,
-        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+        color = MaterialTheme.colorScheme.outlineVariant,
     )
 }
 

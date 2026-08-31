@@ -63,11 +63,22 @@ internal val darkSurface = Color(0xFF1B1C1E)
 internal val darkOnSurface = Color(0xFFE3E4E6)
 internal val darkSurfaceVariant = Color(0xFF46474A)
 internal val darkOnSurfaceVariant = Color(0xFFC5C7CA)
-internal val DarkOutline = Color(0xFFB2B6BB)
+internal val darkOutline = Color(0xFFB2B6BB)
 internal val darkInverseOnSurface = Color(0xFF1B1C1E)
 internal val darkInverseSurface = Color(0xFFE3E4E6)
 internal val darkInversePrimary = Color(0xFFDD912E)
 internal val darkShadow = Color(0xFF000000)
 internal val darkSurfaceTint = Color(0xFFECC38C)
-internal val darkOutlineVariant = Color(0xFF46474A)
+internal val darkOutlineVariant = Color(0xFF94969B)
 internal val darkScrim = Color(0xFF000000)
+
+/**
+ * Cores fixas (independentes do tema claro/escuro) do "instrumento" de sky plot
+ * ([br.com.b256.presentation.skyplot.components.GnssSkyPlot]): o radar deve sempre se parecer
+ * com uma tela de céu noturno, como um instrumento físico, e não com uma superfície do Material
+ * que se inverte junto com o tema. Usar `inverseSurface`/`inverseOnSurface` para isso fazia o
+ * radar virar um círculo quase branco no tema escuro, prejudicando a legibilidade dos ícones de
+ * satélite (cores saturadas como amarelo/ciano perdem contraste sobre fundo claro).
+ */
+internal val SkyPlotSurface = Color(0xFF102A54)
+internal val SkyPlotOnSurface = Color(0xFFF2F0F2)
