@@ -1,6 +1,7 @@
 package br.com.b256.data.repositories
 
 import br.com.b256.data.datastore.PreferencesDataSource
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.entities.enums.Theme
 import br.com.b256.domain.interfaces.SettingsRepository
 import kotlinx.coroutines.flow.Flow
@@ -23,5 +24,11 @@ internal class SettingsRepositoryImpl
 
         override suspend fun setTheme(value: Theme) {
             dataStore.setTheme(theme = value)
+        }
+
+        override fun getDatum(): Flow<Datum> = dataStore.getDatum()
+
+        override suspend fun setDatum(value: Datum) {
+            dataStore.setDatum(datum = value)
         }
     }

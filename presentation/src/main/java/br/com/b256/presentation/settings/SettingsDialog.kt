@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.entities.enums.Theme
 import br.com.b256.presentation.settings.SettingsUiState.Success
 import br.com.b256.presentation.settings.SettingsUiState.Loading
@@ -45,6 +46,7 @@ fun SettingsDialog(
         uiState = uiState,
         onDismiss = onDismiss,
         onChangeTheme = viewModel::onChangeTheme,
+        onChangeDatum = viewModel::onChangeDatum,
     )
 }
 
@@ -53,6 +55,7 @@ fun SettingsDialog(
     uiState: SettingsUiState,
     onDismiss: () -> Unit,
     onChangeTheme: (theme: Theme) -> Unit,
+    onChangeDatum: (datum: Datum) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
 
@@ -81,6 +84,8 @@ fun SettingsDialog(
                         SettingsPanel(
                             theme = uiState.theme,
                             onChangeTheme = onChangeTheme,
+                            datum = uiState.datum,
+                            onChangeDatum = onChangeDatum,
                         )
                     }
                 }
@@ -105,6 +110,8 @@ fun SettingsDialog(
 private fun ColumnScope.SettingsPanel(
     theme: Theme,
     onChangeTheme: (theme: Theme) -> Unit,
+    datum: Datum,
+    onChangeDatum: (datum: Datum) -> Unit,
 ) {
     Text(
         text = stringResource(R.string.presentation_settings_theme),
@@ -113,26 +120,80 @@ private fun ColumnScope.SettingsPanel(
     )
 
     Column(Modifier.selectableGroup()) {
-        SettingsDialogThemeChooserRow(
+        SettingsDialogChooserRow(
             text = stringResource(R.string.presentation_settings_theme_default),
             selected = theme == Theme.FOLLOW_SYSTEM,
             onClick = { onChangeTheme(Theme.FOLLOW_SYSTEM) },
         )
-        SettingsDialogThemeChooserRow(
+        SettingsDialogChooserRow(
             text = stringResource(R.string.presentation_settings_theme_light),
             selected = theme == Theme.LIGHT,
             onClick = { onChangeTheme(Theme.LIGHT) },
         )
-        SettingsDialogThemeChooserRow(
+        SettingsDialogChooserRow(
             text = stringResource(R.string.presentation_settings_theme_dark),
             selected = theme == Theme.DARK,
             onClick = { onChangeTheme(Theme.DARK) },
         )
     }
+
+    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+
+    Text(
+        text = stringResource(R.string.presentation_settings_datum),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = 8.dp),
+    )
+
+    Column(Modifier.selectableGroup()) {
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_wgs84),
+            selected = datum == Datum.WGS84,
+            onClick = { onChangeDatum(Datum.WGS84) },
+        )
+
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_sirgas2000),
+            selected = datum == Datum.SIRGAS2000,
+            onClick = { onChangeDatum(Datum.SIRGAS2000) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_sad69),
+            selected = datum == Datum.SAD69,
+            onClick = { onChangeDatum(Datum.SAD69) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_corrego_alegre),
+            selected = datum == Datum.CORREGO_ALEGRE,
+            onClick = { onChangeDatum(Datum.CORREGO_ALEGRE) },
+        )
+
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_nad83),
+            selected = datum == Datum.NAD83,
+            onClick = { onChangeDatum(Datum.NAD83) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_nad27),
+            selected = datum == Datum.NAD27,
+            onClick = { onChangeDatum(Datum.NAD27) },
+        )
+
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_etrs89),
+            selected = datum == Datum.ETRS89,
+            onClick = { onChangeDatum(Datum.ETRS89) },
+        )
+        SettingsDialogChooserRow(
+            text = stringResource(R.string.presentation_settings_datum_ed50),
+            selected = datum == Datum.ED50,
+            onClick = { onChangeDatum(Datum.ED50) },
+        )
+    }
 }
 
 @Composable
-fun SettingsDialogThemeChooserRow(
+fun SettingsDialogChooserRow(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,

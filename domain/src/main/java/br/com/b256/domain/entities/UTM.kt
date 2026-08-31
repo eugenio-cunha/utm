@@ -1,5 +1,7 @@
 package br.com.b256.domain.entities
 
+import br.com.b256.domain.entities.enums.Datum
+
 data class UTM(
     /**
      * Zone of the UTM coordinates
@@ -20,5 +22,10 @@ data class UTM(
      * [centralMeridian] returns the meridian of the
      * given coordinates
      */
-    val centralMeridian: String
+    val centralMeridian: String,
+
+    /**
+     * Datum geodésico no qual [zone], [easting] e [northing] foram calculados (ver [Datum]).
+     */
+    val datum: Datum,
 )

@@ -15,20 +15,25 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import br.com.b256.data.services.location.extension.UTM
+import br.com.b256.data.services.location.extension.toGpsLocation
 import br.com.b256.domain.entities.GnssInfo
 import br.com.b256.domain.entities.GnssSatellite
 import br.com.b256.domain.entities.GpsLocation
 import br.com.b256.domain.entities.Orientation
 import br.com.b256.domain.entities.enums.Constellation
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.interfaces.LocationProvider
+import br.com.b256.domain.interfaces.SettingsRepository
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlin.time.Instant
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 internal class LocationProviderImpl(
     private val context: Context,
+    private val settingsRepository: SettingsRepository,
 ) : LocationProvider {
 
     private val locationManager =
@@ -41,13 +46,23 @@ internal class LocationProviderImpl(
     override fun getCurrentLocation(): GpsLocation? {
         if (!hasLocationPermission()) return null
 
+        val datum = runBlocking { settingsRepository.getDatum().first() }
+
         return locationManager
             .getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            ?.toGpsLocation()
+            ?.toGpsLocation(datum)
     }
 
+    // O datum é combinado com cada nova localização (em vez de lido uma única vez) para que a
+    // troca de datum nas configurações seja refletida imediatamente, sem esperar um novo fix GPS.
     @SuppressLint("MissingPermission")
     override val locations: Flow<GpsLocation> =
+        combine(rawLocations(), settingsRepository.getDatum()) { location, datum ->
+            location.toGpsLocation(datum)
+        }
+
+    @SuppressLint("MissingPermission")
+    private fun rawLocations(): Flow<Location> =
         callbackFlow {
             if (!hasLocationPermission()) {
                 close()
@@ -55,7 +70,7 @@ internal class LocationProviderImpl(
             }
 
             val listener = LocationListener { location ->
-                trySend(location.toGpsLocation())
+                trySend(location)
             }
 
             locationManager.requestLocationUpdates(
@@ -257,18 +272,6 @@ internal class LocationProviderImpl(
                 context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 }
-
-private fun Location.toGpsLocation(): GpsLocation =
-    GpsLocation(
-        latitude = latitude,
-        longitude = longitude,
-        altitude = if (hasAltitude()) altitude else null,
-        accuracy = if (hasAccuracy()) accuracy else null,
-        speed = if (hasSpeed()) speed else null,
-        bearing = if (hasBearing()) bearing else null,
-        date = Instant.fromEpochMilliseconds(time),
-        utm = UTM,
-    )
 
 private fun Int.toConstellationName(): Constellation =
     when (this) {

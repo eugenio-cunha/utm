@@ -9,6 +9,18 @@
     <string name="presentation_settings_theme_default">Default</string>
     <string name="presentation_settings_theme_light">Light</string>
     <string name="presentation_settings_theme_dark">Dark</string>
+    <string name="presentation_settings_datum">Datum</string>
+    <string name="presentation_settings_datum_wgs84">WGS84</string>
+    <string name="presentation_settings_datum_group_brazil">Brazil</string>
+    <string name="presentation_settings_datum_sirgas2000">SIRGAS2000</string>
+    <string name="presentation_settings_datum_sad69">SAD69</string>
+    <string name="presentation_settings_datum_corrego_alegre">Córrego Alegre</string>
+    <string name="presentation_settings_datum_group_north_america">North America</string>
+    <string name="presentation_settings_datum_nad83">NAD83</string>
+    <string name="presentation_settings_datum_nad27">NAD27</string>
+    <string name="presentation_settings_datum_group_europe">Europe</string>
+    <string name="presentation_settings_datum_etrs89">ETRS89</string>
+    <string name="presentation_settings_datum_ed50">ED50</string>
 
     <string name="presentation_skyplot_meters">%1$.2f</string>
     <string name="presentation_skyplot_altitude">Altitude</string>

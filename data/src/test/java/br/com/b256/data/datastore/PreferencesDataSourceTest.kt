@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import app.cash.turbine.test
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.entities.enums.Theme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -55,6 +56,26 @@ class PreferencesDataSourceTest {
 
             dataSource.getTheme().test {
                 assertEquals(Theme.DARK, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `getDatum retorna WGS84 quando nada foi salvo ainda`() =
+        testScope.runTest {
+            dataSource.getDatum().test {
+                assertEquals(Datum.WGS84, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `setDatum persiste o valor e getDatum passa a refleti-lo`() =
+        testScope.runTest {
+            dataSource.setDatum(Datum.SAD69)
+
+            dataSource.getDatum().test {
+                assertEquals(Datum.SAD69, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
         }

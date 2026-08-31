@@ -7,8 +7,13 @@ import kotlin.time.Instant
  * Esta classe serve como um modelo de dados para manipulação de informações de posicionamento GPS
  * dentro do contexto de conversão para coordenadas UTM.
  *
- * @property latitude A latitude do ponto de coordenada.
- * @property longitude A longitude do ponto de coordenada.
+ * O GPS sempre entrega a posição bruta no datum WGS84, mas [latitude]/[longitude] (e [utm]) já
+ * chegam aqui expressos no datum selecionado pelo usuário (ver
+ * `br.com.b256.domain.usecases.GetDatumUseCase` e `UTM.datum`) — a transformação acontece na
+ * camada `:data` antes da construção deste objeto.
+ *
+ * @property latitude A latitude do ponto de coordenada, no datum de [utm].
+ * @property longitude A longitude do ponto de coordenada, no datum de [utm].
  * @property altitude A altitude do ponto de coordenada.
  * @property accuracy A precisão do ponto de coordenada.
  * @property speed A velocidade do ponto de coordenada.

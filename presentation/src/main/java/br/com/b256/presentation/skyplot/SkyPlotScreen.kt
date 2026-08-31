@@ -63,6 +63,7 @@ import br.com.b256.domain.entities.GnssInfo
 import br.com.b256.domain.entities.GnssSatellite
 import br.com.b256.domain.entities.GpsLocation
 import br.com.b256.domain.entities.Orientation
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.presentation.R
 import br.com.b256.presentation.designsystem.asset.Asset
 import br.com.b256.presentation.designsystem.theme.BorderHalf
@@ -855,37 +856,46 @@ private fun Location(
     val altitudeLabel = stringResource(R.string.presentation_skyplot_altitude)
     val accuracyLabel = stringResource(R.string.presentation_skyplot_accuracy)
     val shareContentDescription = stringResource(R.string.presentation_skyplot_share)
+    val datumLabel = stringResource(datumLabelRes(locationState.utm.datum))
 
     MissionPanel(
         title = shareTitle,
         modifier = modifier,
         trailing = {
-            IconButton(
-                onClick = {
-                    val shareText = buildString {
-                        appendLine("$shareTitle:")
-                        appendLine("$latLabel: ${String.format(locale, "%.6f", locationState.latitude)}°")
-                        appendLine("$lonLabel: ${String.format(locale, "%.6f", locationState.longitude)}°")
-                        appendLine("$zoneLabel: ${locationState.utm.zone}")
-                        appendLine("$eastingLabel: ${locationState.utm.easting}")
-                        appendLine("$northingLabel: ${locationState.utm.northing}")
-                        locationState.altitude?.let {
-                            appendLine("$altitudeLabel: ${String.format(locale, "%.2f", it)}m")
-                        }
-                        locationState.accuracy?.let {
-                            appendLine("$accuracyLabel: ±${String.format(locale, "%.1f", it)}m")
-                        }
-                    }
-                    share(context, shareText)
-                },
-                modifier = Modifier.size(IconDouble),
-            ) {
-                Icon(
-                    imageVector = Asset.Share,
-                    contentDescription = shareContentDescription,
-                    modifier = Modifier.size(IconSingle),
-                    tint = MaterialTheme.colorScheme.primary,
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = datumLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                IconButton(
+                    onClick = {
+                        val shareText = buildString {
+                            appendLine("$shareTitle ($datumLabel):")
+                            appendLine("$latLabel: ${String.format(locale, "%.6f", locationState.latitude)}°")
+                            appendLine("$lonLabel: ${String.format(locale, "%.6f", locationState.longitude)}°")
+                            appendLine("$zoneLabel: ${locationState.utm.zone}")
+                            appendLine("$eastingLabel: ${locationState.utm.easting}")
+                            appendLine("$northingLabel: ${locationState.utm.northing}")
+                            locationState.altitude?.let {
+                                appendLine("$altitudeLabel: ${String.format(locale, "%.2f", it)}m")
+                            }
+                            locationState.accuracy?.let {
+                                appendLine("$accuracyLabel: ±${String.format(locale, "%.1f", it)}m")
+                            }
+                        }
+                        share(context, shareText)
+                    },
+                    modifier = Modifier.size(IconDouble),
+                ) {
+                    Icon(
+                        imageVector = Asset.Share,
+                        contentDescription = shareContentDescription,
+                        modifier = Modifier.size(IconSingle),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
         },
     ) {
@@ -956,6 +966,25 @@ private fun Location(
         }
     }
 }
+
+/**
+ * Recurso de string com o rótulo de exibição de um [Datum] (mesmos rótulos usados em
+ * [SettingsDialog], para o usuário reconhecer facilmente qual datum está selecionado).
+ *
+ * @param datum Datum cujo rótulo deve ser retornado.
+ * @return O recurso de string correspondente.
+ */
+private fun datumLabelRes(datum: Datum): Int =
+    when (datum) {
+        Datum.WGS84 -> R.string.presentation_settings_datum_wgs84
+        Datum.SIRGAS2000 -> R.string.presentation_settings_datum_sirgas2000
+        Datum.SAD69 -> R.string.presentation_settings_datum_sad69
+        Datum.CORREGO_ALEGRE -> R.string.presentation_settings_datum_corrego_alegre
+        Datum.NAD83 -> R.string.presentation_settings_datum_nad83
+        Datum.NAD27 -> R.string.presentation_settings_datum_nad27
+        Datum.ETRS89 -> R.string.presentation_settings_datum_etrs89
+        Datum.ED50 -> R.string.presentation_settings_datum_ed50
+    }
 
 /**
  * Par rótulo/valor usado dentro do painel [Location] para exibir um único dado da localização

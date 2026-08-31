@@ -2,6 +2,7 @@ package br.com.b256.data.repositories
 
 import app.cash.turbine.test
 import br.com.b256.data.datastore.PreferencesDataSource
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.entities.enums.Theme
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -40,5 +41,26 @@ class SettingsRepositoryImplTest {
             repository.setTheme(Theme.LIGHT)
 
             coVerify(exactly = 1) { dataSource.setTheme(Theme.LIGHT) }
+        }
+
+    @Test
+    fun `getDatum repassa a emissao da fonte de dados`() =
+        runTest {
+            every { dataSource.getDatum() } returns flowOf(Datum.SAD69)
+
+            repository.getDatum().test {
+                assertEquals(Datum.SAD69, awaitItem())
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `setDatum delega a persistencia para a fonte de dados`() =
+        runTest {
+            coEvery { dataSource.setDatum(Datum.SAD69) } returns Unit
+
+            repository.setDatum(Datum.SAD69)
+
+            coVerify(exactly = 1) { dataSource.setDatum(Datum.SAD69) }
         }
 }

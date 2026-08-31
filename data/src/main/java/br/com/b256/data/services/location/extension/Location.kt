@@ -2,7 +2,9 @@ package br.com.b256.data.services.location.extension
 
 import android.location.Location
 import br.com.b256.data.services.location.LocaleHelper
+import br.com.b256.domain.entities.GpsLocation
 import br.com.b256.domain.entities.UTM
+import br.com.b256.domain.entities.enums.Datum
 import gov.nasa.worldwind.geom.Angle
 import gov.nasa.worldwind.geom.coords.UTMCoord
 import kotlin.time.Instant
@@ -12,22 +14,46 @@ import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private fun getUtmEasting(lat: Double, lon: Double): String {
-    return "${
-        String.format(
-            LocaleHelper.getAppLocale(),
-            "%7.0f",
-            getUtmCoord(lat, lon).easting,
-        )
-    }m E".trim()
+/**
+ * Converte esta [Location] — sempre reportada pelo GPS no datum WGS84 — para [GpsLocation],
+ * expressando latitude/longitude e UTM no [datum] selecionado pelo usuário (ver
+ * [transformToDatum]). Quando [datum] é [Datum.WGS84], a posição não sofre alteração.
+ *
+ * @param datum Datum geodésico no qual a posição deve ser expressa.
+ */
+internal fun Location.toGpsLocation(datum: Datum): GpsLocation {
+    val altitudeMeters = if (hasAltitude()) altitude else 0.0
+    val (datumLat, datumLon) = transformToDatum(latitude, longitude, altitudeMeters, datum)
+
+    return GpsLocation(
+        latitude = datumLat,
+        longitude = datumLon,
+        altitude = if (hasAltitude()) altitude else null,
+        accuracy = if (hasAccuracy()) accuracy else null,
+        speed = if (hasSpeed()) speed else null,
+        bearing = if (hasBearing()) bearing else null,
+        date = Instant.fromEpochMilliseconds(time),
+        utm = utmOf(lat = datumLat, lon = datumLon, datum = datum),
+    )
+}
+
+private fun utmOf(lat: Double, lon: Double, datum: Datum): UTM {
+    val coord = getUtmCoord(lat, lon)
+    return UTM(
+        zone = "${coord.zone}${getUtmLatBand(lat)}".trim(),
+        easting = formatUtmValue(coord.easting, "E"),
+        northing = formatUtmValue(coord.northing, "N"),
+        centralMeridian = coord.centralMeridian.toString(),
+        datum = datum,
+    )
+}
+
+private fun formatUtmValue(value: Double, hemisphereLabel: String): String {
+    return "${String.format(LocaleHelper.getAppLocale(), "%7.0f", value)}m $hemisphereLabel".trim()
 }
 
 private fun getUtmCoord(lat: Double, lon: Double): UTMCoord {
     return UTMCoord.fromLatLon(Angle.fromDegreesLatitude(lat), Angle.fromDegreesLongitude(lon))
-}
-
-private fun getUtmZone(lat: Double, lon: Double): String {
-    return "${getUtmCoord(lat, lon).zone}${getUtmLatBand(lat)}".trim()
 }
 
 private fun getUtmLatBand(lat: Double): String {
@@ -55,24 +81,6 @@ private fun getUtmLatBand(lat: Double): String {
         else -> ""
     }
 }
-
-private fun getUtmNorthing(lat: Double, lon: Double): String {
-    return "${
-        String.format(
-            LocaleHelper.getAppLocale(),
-            "%7.0f",
-            getUtmCoord(lat, lon).northing,
-        )
-    }m N".trim()
-}
-
-internal val Location.UTM: UTM
-    get() = UTM(
-        getUtmZone(latitude, longitude),
-        getUtmEasting(latitude, longitude),
-        getUtmNorthing(latitude, longitude),
-        getUtmCoord(latitude, longitude).centralMeridian.toString(),
-    )
 
 internal fun Location.instant() = Instant.fromEpochMilliseconds(time)
 

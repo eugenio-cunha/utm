@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import br.com.b256.domain.entities.enums.Datum
 import br.com.b256.domain.entities.enums.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -38,7 +39,24 @@ internal class PreferencesDataSource
             }
         }
 
+        suspend fun setDatum(datum: Datum) {
+            dataStore.edit { preferences ->
+                preferences[DATUM] = datum.value
+            }
+        }
+
+        fun getDatum(): Flow<Datum> {
+            return dataStore.data.map { preferences ->
+                if (preferences[DATUM].isNullOrBlank()) {
+                    Datum.WGS84
+                } else {
+                    Datum.from(preferences[DATUM]!!)
+                }
+            }
+        }
+
         companion object PreferencesKeys {
             val THEME = stringPreferencesKey("theme")
+            val DATUM = stringPreferencesKey("datum")
         }
     }
