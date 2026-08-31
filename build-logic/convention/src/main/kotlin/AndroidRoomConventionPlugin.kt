@@ -1,17 +1,27 @@
-import androidx.room.gradle.RoomExtension
-import com.google.devtools.ksp.gradle.KspExtension
-import br.com.b256.extension.libs
+import br.com.b256.gnss.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import androidx.room.gradle.RoomExtension
+import com.google.devtools.ksp.gradle.KspExtension
 
+/**
+ * Plugin de convenção para habilitar Room num módulo Android (id `b256.android.room`, aplicado
+ * hoje só em `data/build.gradle.kts`).
+ *
+ * Configura o plugin oficial `androidx.room` + KSP (gerando o compilador em Kotlin, não Java) e
+ * define o diretório de schemas (`<módulo>/schemas`) necessário para migrações automáticas do
+ * Room. Se um novo módulo precisar de um banco Room próprio, basta aplicar `b256.android.room`
+ * nele.
+ */
 class AndroidRoomConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("androidx.room")
-            pluginManager.apply("com.google.devtools.ksp")
+            apply(plugin = "androidx.room")
+            apply(plugin = "com.google.devtools.ksp")
 
             extensions.configure<KspExtension> {
                 arg("room.generateKotlin", "true")
@@ -25,9 +35,9 @@ class AndroidRoomConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("api", libs.findLibrary("room.runtime").get())
-                add("implementation", libs.findLibrary("room.ktx").get())
-                add("ksp", libs.findLibrary("room.compiler").get())
+                "implementation"(libs.findLibrary("room.runtime").get())
+                "implementation"(libs.findLibrary("room.ktx").get())
+                "ksp"(libs.findLibrary("room.compiler").get())
             }
         }
     }

@@ -1,4 +1,3 @@
 <resources>
-    <string name="app_name">UTM</string>
-    <string name="app_offline">⚠️ You are not connected to the internet.</string>
+    <string name="app_name" translatable="false">GNSS SkyPlot</string>
 </resources>

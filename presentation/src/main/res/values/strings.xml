@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="presentation_skyplot_title">GNSS SkyPlot</string>
+    <string name="presentation_skyplot_top_app_bar_action_settings">Settings</string>
+    <string name="presentation_settings_title">Settings</string>
+    <string name="presentation_settings_loading">Loading\n</string>
+    <string name="presentation_settings_dismiss_dialog_button_text">OK</string>
+    <string name="presentation_settings_theme">Theme</string>
+    <string name="presentation_settings_theme_default">Default</string>
+    <string name="presentation_settings_theme_light">Light</string>
+    <string name="presentation_settings_theme_dark">Dark</string>
+    <string name="presentation_settings_datum">Datum</string>
+    <string name="presentation_settings_datum_wgs84">WGS84</string>
+    <string name="presentation_settings_datum_group_brazil">Brazil</string>
+    <string name="presentation_settings_datum_sirgas2000">SIRGAS2000</string>
+    <string name="presentation_settings_datum_sad69">SAD69</string>
+    <string name="presentation_settings_datum_corrego_alegre">Córrego Alegre</string>
+    <string name="presentation_settings_datum_group_north_america">North America</string>
+    <string name="presentation_settings_datum_nad83">NAD83</string>
+    <string name="presentation_settings_datum_nad27">NAD27</string>
+    <string name="presentation_settings_datum_group_europe">Europe</string>
+    <string name="presentation_settings_datum_etrs89">ETRS89</string>
+    <string name="presentation_settings_datum_ed50">ED50</string>
+
+    <string name="presentation_skyplot_meters">%1$.2f</string>
+    <string name="presentation_skyplot_altitude">Altitude</string>
+    <string name="presentation_skyplot_accuracy">Accuracy</string>
+    <string name="presentation_skyplot_latitude">Latitude</string>
+    <string name="presentation_skyplot_longitude">Longitude</string>
+    <string name="presentation_skyplot_easting">Easting</string>
+    <string name="presentation_skyplot_northing">Northing</string>
+    <string name="presentation_skyplot_zone">Zone</string>
+    <string name="presentation_skyplot_satellites">Satellites</string>
+    <string name="presentation_skyplot_satellite_id">ID</string>
+    <string name="presentation_skyplot_satellite_constellation">Const.</string>
+    <string name="presentation_skyplot_satellite_signal">Signal</string>
+    <string name="presentation_skyplot_satellite_elevation">Elev.</string>
+    <string name="presentation_skyplot_satellite_azimuth">Azim.</string>
+    <string name="presentation_skyplot_share">Share Location</string>
+    <string name="presentation_skyplot_location_title">Current Position</string>
+    <string name="presentation_skyplot_panel_skyview">Sky View</string>
+    <string name="presentation_skyplot_satellites_in_fix">%1$d / %2$d IN FIX</string>
+    <string name="presentation_skyplot_status_fix_acquired">Fix Acquired</string>
+    <string name="presentation_skyplot_status_acquiring">Acquiring Signal</string>
+    <string name="presentation_skyplot_status_no_signal">No Signal</string>
+</resources>

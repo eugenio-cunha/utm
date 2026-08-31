@@ -1,50 +1,46 @@
-# built application files
-*.apk
-*.ap_
+# Gradle
+.gradle/
+**/build/
+build-logic/**/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
 
-# files for the dex VM
-*.dex
-
-# Java class files
-*.class
-
-# generated files
-bin/
-gen/
-out/
-build/
-production/
-generated/
-
-# Local configuration file (sdk path, etc)
+# Local configuration
 local.properties
 
-# Eclipse project files
-.classpath
-.project
+# Kotlin
+.kotlin/
 
-# Windows thumbnail db
+# Log files
+*.log
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+*.hprof
+
+# Android build artifacts
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystores and signing (never commit real signing material)
+*.jks
+*.keystore
+key.properties
+
+# Firebase / Google Services (contains project-specific keys)
+google-services.json
+
+# macOS
 .DS_Store
 
-# IDEA/Android Studio project files, because
-# the project can be imported from settings.gradle.kts
-*.iml
-.idea/*
-!.idea/copyright
-# Keep the code styles.
-!/.idea/codeStyles
-/.idea/codeStyles/*
-!/.idea/codeStyles/Project.xml
-!/.idea/codeStyles/codeStyleConfig.xml
-
-# Gradle cache
-.gradle
-
-# Sandbox stuff
-_sandbox
-
-# Android Studio captures folder
-captures/
-
-# Kotlin
-.kotlin
+# Windows
+Thumbs.db

@@ -4,10 +4,8 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "br.com.b256.buildlogic"
+group = "br.com.b256.gnss.buildlogic"
 
-// Configure the build-logic plugins to target JDK 17
-// This matches the JDK used to build the project, and is not related to what is running on device.
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -15,72 +13,69 @@ java {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
 dependencies {
-    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.tools.common)
-    compileOnly(libs.compose.gradlePlugin)
-    compileOnly(libs.kotlin.gradlePlugin)
-    compileOnly(libs.ksp.gradlePlugin)
-    compileOnly(libs.room.gradlePlugin)
-    implementation(libs.truth)
-}
-
-tasks {
-    validatePlugins {
-        enableStricterValidation = true
-        failOnWarning = true
-    }
+    compileOnly(libs.ksp.gradle.plugin)
+    compileOnly(libs.room.gradle.plugin)
+    compileOnly(libs.spotless.gradle.plugin)
 }
 
 gradlePlugin {
     plugins {
-        register("androidApplicationCompose") {
-            id = "b256.android.application.compose"
-            implementationClass = "AndroidApplicationComposeConventionPlugin"
-        }
         register("androidApplication") {
-            id = "b256.android.application"
+            id = libs.plugins.b256.android.application.get().pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
-        register("androidLibraryCompose") {
-            id = "b256.android.library.compose"
-            implementationClass = "AndroidLibraryComposeConventionPlugin"
-        }
+
         register("androidLibrary") {
-            id = "b256.android.library"
+            id = libs.plugins.b256.android.library.get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
         }
-        register("androidFeature") {
-            id = "b256.android.feature"
-            implementationClass = "AndroidFeatureConventionPlugin"
+
+        register("jvmLibrary") {
+            id = libs.plugins.b256.jvm.library.get().pluginId
+            implementationClass = "JvmLibraryConventionPlugin"
         }
-        register("androidTest") {
-            id = "b256.android.test"
-            implementationClass = "AndroidTestConventionPlugin"
+
+        register("androidCompose") {
+            id = libs.plugins.b256.android.compose.get().pluginId
+            implementationClass = "AndroidComposeConventionPlugin"
         }
-        register("hilt") {
-            id = "b256.hilt"
-            implementationClass = "HiltConventionPlugin"
-        }
+
         register("androidRoom") {
-            id = "b256.android.room"
+            id = libs.plugins.b256.android.room.get().pluginId
             implementationClass = "AndroidRoomConventionPlugin"
         }
+
+        register("androidHilt") {
+            id = libs.plugins.b256.hilt.get().pluginId
+            implementationClass = "HiltConventionPlugin"
+        }
+
+        register("androidPresentation") {
+            id = libs.plugins.b256.presentation.get().pluginId
+            implementationClass = "AndroidPresentationConventionPlugin"
+        }
+
         register("androidFlavors") {
-            id = "b256.android.application.flavors"
+            id = libs.plugins.b256.flavors.get().pluginId
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
-        register("androidLint") {
-            id = "b256.android.lint"
-            implementationClass = "AndroidLintConventionPlugin"
+
+        register("root") {
+            id = libs.plugins.b256.root.get().pluginId
+            implementationClass = "RootPlugin"
         }
-        register("jvmLibrary") {
-            id = "b256.jvm.library"
-            implementationClass = "JvmLibraryConventionPlugin"
+
+        register("androidTest") {
+            id = libs.plugins.b256.android.test.get().pluginId
+            implementationClass = "AndroidTestConventionPlugin"
         }
     }
 }
