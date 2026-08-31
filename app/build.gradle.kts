@@ -11,8 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "br.com.b256.utm"
-        versionCode = 47
-        versionName = "1.0.4"
+        versionCode = 50
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
